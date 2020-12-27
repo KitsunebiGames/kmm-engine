@@ -2,7 +2,7 @@
 Fork of the [Kitsune Mahjong engine](https://github.com/KitsunebiGames/km-engine) for use in VTuber Game Jam
 
 ## Dependencies
-The VTJam Mahjong engine requires the following dependencies to be present to work:
+The VTJam engine requires the following dependencies to be present to work:
  * OpenAL Driver ([OpenAL-Soft included on Windows](https://github.com/kcat/openal-soft))
  * OpenGL Driver
  * GLFW3
