@@ -19,6 +19,3 @@ copyFiles "libs/COPYING-FreeType" "libs/COPYING-XIPH" "libs/COPYING-OpenALSoft" 
 copyFiles "libs/libvorbis.dll" "libs/libvorbisfile.dll" "libs/freetype.dll" "libs/OpenAL32.dll" "libs/glfw3.dll" platform="windows"
 versions "GL_33" "GLFW_33"
 stringImportPaths "res/"
-
-// Optimize with LTCG
-lflags "/LTCG" platform="windows"
