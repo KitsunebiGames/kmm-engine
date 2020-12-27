@@ -61,9 +61,6 @@ void initEngine() {
 
     // Initialize subsystems
     AppLog.info("Engine", "Intialized internal state for renderer...");
-
-    initPlaylist();
-    AppLog.info("Engine", "Initialized smaller subsystems...");
 }
 
 /**
@@ -71,7 +68,6 @@ void initEngine() {
 */
 void closeEngine() {
     import core.memory : GC;
-    destroy(GamePlaylist);
     destroy(GameWindow);
 	destroy(AppLog);
 
