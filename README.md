@@ -10,6 +10,7 @@ The VTJam engine requires the following dependencies to be present to work:
  * libvorbis
  * libvorbisfile
  * FreeType
+ * AngelScript (Precompiled patched version with D support)
  * Kosugi Maru Font (in [`res/fonts`](/res/fonts) w/ license)
 
 On Windows these libraries are copied from the included libs/ folder.
