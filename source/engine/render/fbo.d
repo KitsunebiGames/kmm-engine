@@ -16,7 +16,7 @@ class Framebuffer {
 private:
     Window window;
 
-    vec2i size;
+    vec2i _size;
     vec2i realsize;
 
     GLuint fbo;
@@ -39,7 +39,7 @@ public:
     */
     this(Window window, vec2i size) {
         this.window = window;
-        this.size = size;
+        this._size = size;
         this.realsize = size*2;
         
         // Bind FBO
@@ -78,7 +78,7 @@ public:
     void bind() {
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
         kmViewport(0, 0, realsize.x, realsize.y);
-        kmSetCameraTargetSize(size.x, size.y);
+        kmSetCameraTargetSize(_size.x, _size.y);
     }
 
     /**
@@ -87,6 +87,20 @@ public:
     void unbind() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         kmViewport(0, 0, window.width, window.height);
+    }
+
+    /**
+        Resizes the framebuffer
+    */
+    void resize(vec2i size) {
+        this._size = size;
+        this.realsize = size*2;
+
+        glBindTexture(GL_TEXTURE_2D, color);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, realsize.x, realsize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, null);
+
+        glBindRenderbuffer(GL_RENDERBUFFER, depth);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, realsize.x, realsize.y);
     }
 
     /**
@@ -125,6 +139,13 @@ public:
     }
 
     /**
+        Gets the real size of the framebuffer
+    */
+    vec2i size() {
+        return _size;
+    }
+
+    /**
         Real width of framebuffer
     */
     int realWidth() {
@@ -136,5 +157,12 @@ public:
     */
     int realHeight() {
         return realsize.y;
+    }
+
+    /**
+        Gets the real size of the framebuffer
+    */
+    vec2i realSize() {
+        return realsize;
     }
 }

@@ -12,6 +12,8 @@ private double previousTime_;
 private double currentTime_;
 private double deltaTime_;
 
+private Framebuffer framebuffer;
+
 /**
     Function run when the game is to initialize
 */
@@ -46,7 +48,7 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
     gameInit();
     resetTime();
 
-    Framebuffer framebuffer = new Framebuffer(GameWindow, viewportSize);
+    framebuffer = new Framebuffer(GameWindow, viewportSize);
     while(!GameWindow.isExitRequested) {
 
         currentTime_ = glfwGetTime();
@@ -89,6 +91,20 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
 
     // Game cleanup
     gameCleanup();
+}
+
+/**
+    Resizes the game's viewport
+*/
+void setViewport(vec2i size) {
+    framebuffer.resize(size);
+}
+
+/**
+    Gets the size of the framebuffer
+*/
+vec2i getViewport() {
+    return framebuffer.size;
 }
 
 /**
