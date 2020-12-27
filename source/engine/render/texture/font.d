@@ -214,7 +214,7 @@ public:
         copy(memFace, faceMemory);
 
         AppLog.info("FontLoader", "Loading font from memory with size %s", memFace.length);
-        int err = FT_New_Memory_Face(lib, faceMemory.ptr, faceMemory.length, 0, &fontFace);
+        int err = FT_New_Memory_Face(lib, faceMemory.ptr, cast(int)faceMemory.length, 0, &fontFace);
 
         enforce(err != FT_Err_Unknown_File_Format, "Unknown file format");
         enforce(err == FT_Err_Ok, "Error %s while loading font file".format(err));
