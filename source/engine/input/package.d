@@ -11,82 +11,60 @@ import bindbc.sdl;
 
 public import engine.input.keyboard;
 public import engine.input.mouse;
+public import engine.input.controller;
+public import engine.input.text;
 
-private struct Keybinding {
-    Key key;
+private {
+    enum BindingType {
+        Key,
+        Button,
+        Axis
+    }
 
-    bool lstate;
-    bool state;
+    struct KeyBinding {
+        Key key;
+        bool lastState;
+        bool currentState;
+    }
+
+    struct ButtonBinding {
+        Button button;
+        bool lastState;
+        bool currentState;
+    }
+
+    struct AxisBinding {
+        Axis axis;
+        float pval;
+        float val;
+    }
+    
+    struct Binding {
+        BindingType type;
+        union {
+            KeyBinding kb;
+            ButtonBinding bb;
+            AxisBinding ab;
+        }
+    }
 }
 
 class Input {
 private static:
-    Keybinding*[string] keybindings;
+    Binding[string] bindings;
     KeyboardState* state;
 
 public static:
-
-    /**
-        Register a key and a default binding for a keybinding
-    */
-    void registerKey(string name, Key binding) {
-        keybindings[name] = new Keybinding(binding, false, false);
-    }
-
-    /**
-        Load keybindings from a list of bindings
-    */
-    void loadBindings(Key[string] bindings) {
-        foreach(name, binding; bindings) {
-            registerKey(name, binding);
-        }
-    }
-
-    /**
-        Gets the key attached to a keybinding
-    */
-    Key getKeyFor(string name) {
-        return keybindings[name].key;
-    }
-
-    /**
-        Whether a user pressed the specified binding button
-    */
-    bool isPressed(string name) {
-        return keybindings[name].state && keybindings[name].state != keybindings[name].lstate;
-    }
-
-    /**
-        Whether a user pressed the specified binding button the last frame
-    */
-    bool wasPressed(string name) {
-        return !keybindings[name].state && keybindings[name].state != keybindings[name].lstate;
-    }
-
-    /**
-        Whether a user pressed the specified binding button
-    */
-    bool isDown(string name) {
-        return keybindings[name].state;
-    }
-
-    /**
-        Whether a user pressed the specified binding button
-    */
-    bool isUp(string name) {
-        return !keybindings[name].state;
-    }
-
     /**
         Updates the keybinding states
     */
     void update() {
         state = Keyboard.getState();
 
-        // Update keybindings
-        foreach(binding; keybindings) {
-            binding.lstate = binding.state;
-            binding.state = state.isKeyDown(binding.key);
-        }
+        // // Update keybindings
+        // foreach(binding; bindings) {
+        //     binding.lstate = binding.state;
+        //     binding.state = state.isKeyDown(binding.key);
+        // }
     }
 }

@@ -138,17 +138,7 @@ public:
         poll for new window events
     */
     void update() {
-        SDL_PumpEvents();
         SDL_GL_GetDrawableSize(window, &fbWidth, &fbHeight);
-
-
-        // Handle window close
-        SDL_Event ev;
-        while(SDL_PollEvent(&ev) == 1) {
-            if (ev.window.event == SDL_WindowEventID.SDL_WINDOWEVENT_CLOSE) {
-                close();
-            }
-        }
     }
 
     /**

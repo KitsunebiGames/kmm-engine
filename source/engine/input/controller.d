@@ -1,6 +1,7 @@
 module engine.input.controller;
 import bindbc.sdl;
 import std.exception;
+import containers.list;
 
 /**
     Controller types
@@ -17,9 +18,11 @@ enum ControllerType {
 /**
     An axis
 */
-enum Axis {
-    LeftThumbstick = SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTX,
-    RightThumbstick = SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTX,
+enum Axis : SDL_GameControllerAxis {
+    LeftStickX = SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTX,
+    LeftStickY = SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTY,
+    RightStickX = SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTX,
+    RightStickY = SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTY,
     TriggerLeft = SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERLEFT,
     TriggerRight = SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERRIGHT
 }
@@ -46,14 +49,102 @@ enum Button {
 }
 
 /**
-    A controller
+    Players
+*/
+enum PlayerIndex {
+    PlayerOne,
+    PlayerTwo,
+    PlayerThree,
+    PlayerFour
+}
+
+/**
+    Contoller manager
 */
 class Controller {
 private:
+    static List!ControllerInstance controllers;
+
+package(engine):
+    static void update(SDL_Event* ev) {
+        switch(ev.type) {
+            case SDL_EventType.SDL_JOYDEVICEADDED:
+
+                // Doesn't matter if it's not a controller
+                if (!SDL_IsGameController(ev.jdevice.which)) break;
+
+                // Add controller to map
+                controllers.add(new ControllerInstance(ev.jdevice.which));
+                break;
+
+            case SDL_EventType.SDL_JOYDEVICEREMOVED:
+
+                // Doesn't matter if it's not a controller
+                if (!SDL_IsGameController(ev.jdevice.which)) break;
+
+                // Find the controller we want to remove
+                int controllerToRemove = -1;
+                foreach(i; 0..controllers.count) {
+                    if (controllers[i].id == ev.jdevice.which) {
+                        controllerToRemove = cast(int)i;
+                        break; 
+                    }
+                }
+
+                // Couldn't find controller???
+                if (controllerToRemove == -1) break;
+
+                // Remove the controller that we can't use anymore
+                controllers.removeAt(controllerToRemove);
+                break;
+
+            // We only handle controller events here
+            default: break;
+        }
+    }
+
+public:
+    /**
+        Gets the amount of controllers
+    */
+    static size_t count() {
+        return controllers.count;
+    }
+
+    /**
+        Gets whether a controller is present
+    */
+    static bool has(int index) {
+        return index >= 0 && index < controllers.count;
+    }
+
+    /**
+        Gets the state of the player's controller
+    */
+    static ControllerInstance getController(int index) {
+        return controllers[index];
+    }
+}
+
+/**
+    A controller
+*/
+class ControllerInstance {
+private:
     SDL_GameController* controller;
+    int id;
 
     void update() {
         SDL_GameControllerUpdate();
+    }
+
+    /**
+        Open controller with id
+    */
+    this(int id) {
+        this.id = id;
+        enforce(SDL_IsGameController(id), "Input device was not a controller");
+        controller = SDL_GameControllerOpen(id);
     }
 
 public:
@@ -65,18 +156,10 @@ public:
     }
 
     /**
-        Open controller with id
-    */
-    this(int id) {
-        enforce(SDL_IsGameController(id), "Input device was not a controller");
-        controller = SDL_GameControllerOpen(id);
-    }
-
-    /**
         Gets whether the controller is connected and available for use
     */
     bool isAttached() {
-        return SDL_GameControllerGetAttached(controller);
+        return cast(bool)SDL_GameControllerGetAttached(controller);
     }
 
     /**
@@ -90,32 +173,42 @@ public:
         Gets whether the controller button is pressed
     */
     bool isButtonPressed(Button button) {
-        return SDL_GameControllerGetButton(controller, button);
+        return cast(bool)SDL_GameControllerGetButton(controller, button);
     }
 
     /**
         Gets whether the button is released
     */
     bool isButtonReleased(Button button) {
-        return SDL_GameControllerGetButton(controller, button);
+        return cast(bool)SDL_GameControllerGetButton(controller, button);
     }
 
     /**
-        Gets left thumbstick
+        X position of left stick
     */
-    vec2 getLeftThumbstick() {
-        short x = SDL_GameControllerGetAxis(controller, cast(int)Axis.LeftThumbstick);
-        short y = SDL_GameControllerGetAxis(controller, cast(int)Axis.LeftThumbstick+1);
-        return vec2(cast(float)x/cast(float)short.max, cast(float)y/cast(float)short.max);
+    float leftStickX() {
+        return cast(float)SDL_GameControllerGetAxis(controller, Axis.LeftStickX)/cast(float)short.max;
     }
 
     /**
-        Gets right thumbstick
+        Y position of left stick
     */
-    vec2 getRightThumbstick() {
-        short x = SDL_GameControllerGetAxis(controller, cast(int)Axis.RightThumbstick);
-        short y = SDL_GameControllerGetAxis(controller, cast(int)Axis.RightThumbstick+1);
-        return vec2(cast(float)x/cast(float)short.max, cast(float)y/cast(float)short.max);
+    float leftStickY() {
+        return cast(float)SDL_GameControllerGetAxis(controller, Axis.LeftStickY)/cast(float)short.max;
+    }
+
+    /**
+        X position of right stick
+    */
+    float rightStickX() {
+        return cast(float)SDL_GameControllerGetAxis(controller, Axis.RightStickX)/cast(float)short.max;
+    }
+
+    /**
+        Y position of right stick
+    */
+    float rightSitckY() {
+        return cast(float)SDL_GameControllerGetAxis(controller, Axis.RightStickY)/cast(float)short.max;
     }
 
     /**

@@ -50,6 +50,9 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
     framebuffer = new Framebuffer(GameWindow, viewportSize);
     while(!GameWindow.isExitRequested) {
 
+        // Pump events for this update cycle
+        SDL_PumpEvents();
+
         currentTime_ = cast(double)SDL_GetPerformanceCounter()/cast(double)SDL_GetPerformanceFrequency();
         deltaTime_ = currentTime_-previousTime_;
         previousTime_ = currentTime_;
@@ -82,6 +85,18 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
         // Swap buffers and update the window
         GameWindow.swapBuffers();
         GameWindow.update();
+        
+        // Event handling
+        SDL_Event ev;
+        while(SDL_PollEvent(&ev) == 1) {
+            Controller.update(&ev);
+            TextInput.update(&ev);
+
+            // Handle window close
+            if (ev.window.event == SDL_WindowEventID.SDL_WINDOWEVENT_CLOSE) {
+                GameWindow.close();
+            }
+        }
     }
 
     // Pop all states
