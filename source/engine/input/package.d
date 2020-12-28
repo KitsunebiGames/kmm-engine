@@ -7,22 +7,10 @@
     Authors: Luna Nielsen
 */
 module engine.input;
-import bindbc.glfw;
+import bindbc.sdl;
 
 public import engine.input.keyboard;
 public import engine.input.mouse;
-
-/**
-    Initializes input system
-*/
-void initInput(GLFWwindow* window) {
-
-    // Initialize keyboard
-    Keyboard.initialize(window);
-
-    // Initialize mouse
-    Mouse.initialize(window);
-}
 
 private struct Keybinding {
     Key key;
@@ -34,6 +22,7 @@ private struct Keybinding {
 class Input {
 private static:
     Keybinding*[string] keybindings;
+    KeyboardState* state;
 
 public static:
 
@@ -92,11 +81,12 @@ public static:
         Updates the keybinding states
     */
     void update() {
+        state = Keyboard.getState();
 
         // Update keybindings
         foreach(binding; keybindings) {
             binding.lstate = binding.state;
-            binding.state = Keyboard.isKeyPressed(binding.key);
+            binding.state = state.isKeyDown(binding.key);
         }
     }
 }

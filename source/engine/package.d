@@ -16,7 +16,7 @@ public import engine.game;
 public import engine.i18n;
 public import engine.scripting;
 
-import bindbc.glfw;
+import bindbc.sdl;
 import bindbc.openal;
 import bindbc.freetype;
 
@@ -27,10 +27,10 @@ void initEngine() {
     // Initialize logger if needed
     if (AppLog is null) AppLog = new Logger();
 
-    // Initialize GLFW
-    initGLFW();
-    glfwInit();
-    AppLog.info("Engine", "GLFW initialized...");
+    // Initialize SDL2
+    initSDL();
+    SDL_Init(SDL_INIT_EVERYTHING);
+    AppLog.info("Engine", "SDL2 initialized...");
 
     // Initialize OpenAL
     initOAL();
@@ -53,8 +53,8 @@ void initEngine() {
     AppLog.info("Engine", "Font system initialized...");
 
     // Initialize input
-    initInput(GameWindow.winPtr);
-    AppLog.info("Engine", "Input system initialized...");
+    // initInput(GameWindow.winPtr);
+    // AppLog.info("Engine", "Input system initialized...");
 
     // Initialize atlasser
     GameAtlas = new AtlasCollection();
@@ -86,12 +86,12 @@ private void initOAL() {
     }
 }
 
-private void initGLFW() {
-    auto support = loadGLFW();
-    if (support == GLFWSupport.badLibrary) {
-        AppLog.fatal("Engine", "Could not load GLFW, bad library!");
-    } else if (support == GLFWSupport.noLibrary) {
-        AppLog.fatal("Engine", "Could not load GLFW, no library found!");
+private void initSDL() {
+    auto support = loadSDL();
+    if (support == SDLSupport.badLibrary) {
+        AppLog.fatal("Engine", "Could not load SDL2, bad library!");
+    } else if (support == SDLSupport.noLibrary) {
+        AppLog.fatal("Engine", "Could not load SDL2, no library found!");
     }
 }
 

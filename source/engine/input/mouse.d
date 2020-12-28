@@ -6,16 +6,55 @@
 */
 module engine.input.mouse;
 import engine.input;
-import bindbc.glfw;
+import bindbc.sdl;
 import gl3n.linalg;
 
 /**
     The buttons on a mouse
 */
 enum MouseButton {
-    Left = GLFW_MOUSE_BUTTON_LEFT,
-    Middle = GLFW_MOUSE_BUTTON_MIDDLE,
-    Right = GLFW_MOUSE_BUTTON_RIGHT
+    Left = SDL_BUTTON_LMASK ,
+    Middle = SDL_BUTTON_MMASK,
+    Right = SDL_BUTTON_RMASK,
+    X1 = SDL_BUTTON_X1MASK,
+    X2 = SDL_BUTTON_X2MASK
+}
+
+/**
+    The state of the mouse
+*/
+struct MouseState {
+private:
+    int btnMask;
+
+public:
+
+    /**
+        Position of the mouse, z is scroll
+    */
+    vec3 position;
+
+    /**
+        Initialize this mouse state
+    */
+    this(vec3 pos, int btnMask) {
+        this.position = pos;
+        this.btnMask = btnMask;
+    }
+
+    /**
+        Gets whether a mouse button is pressed
+    */
+    bool isButtonPressed(MouseButton button) {
+        return (btnMask & button) > 0;
+    }
+
+    /**
+        Gets whether a mouse button is released
+    */
+    bool isButtonReleased(MouseButton button) {
+        return (btnMask & button) > 0;
+    }
 }
 
 /**
@@ -23,62 +62,42 @@ enum MouseButton {
 */
 class Mouse {
 private static:
-    GLFWwindow* window;
-
-    bool[MouseButton] lastState;
+    vec2i lastPos;
 
 public static:
 
-    /**
-        Constructs the underlying data needed
-    */
-    void initialize(GLFWwindow* window) {
-        this.window = window;
+    MouseState* getState() {
+
+        // Get mouse state
+        int* x, y;
+        immutable(int) mask = SDL_GetMouseState(x, y);
+        
+        // Fallback to last position if needed
+        if (x is null) x = &lastPos.vector[0];
+        if (y is null) y = &lastPos.vector[1];
+
+        // Set position
+        lastPos = vec2i(*x, *y);
+
+        // TODO: Get scroll from events
+        float scroll = 0;
+        return new MouseState(vec3(*x, *y, scroll), mask);
     }
 
     /**
-        Gets mouse position
+        Position of the cursor
     */
-    vec2 position() {
-        double x, y;
-        glfwGetCursorPos(window, &x, &y);
-        return vec2(cast(float)x, cast(float)y);
-    }
+    static vec2 position() {
 
-    /**
-        Gets if a mouse button is pressed
-    */
-    bool isButtonPressed(MouseButton button) {
-        return glfwGetMouseButton(window, button) == GLFW_PRESS;
-    }
+        // Get mouse state
+        int* x, y;
+        SDL_GetMouseState(x, y);
+        
+        // Fallback to last position if needed
+        if (x is null) x = &lastPos.vector[0];
+        if (y is null) y = &lastPos.vector[1];
 
-    /**
-        Gets if a mouse button is released
-    */
-    bool isButtonReleased(MouseButton button) {
-        return glfwGetMouseButton(window, button) == GLFW_RELEASE;
-    }
-
-    /**
-        Gets whether the button was clicked
-    */
-    bool isButtonClicked(MouseButton button) {
-        return !lastState[button] && isButtonPressed(button);
-    }
-
-    /**
-        Gets whether the button was clicked
-    */
-    bool isButtonUnclicked(MouseButton button) {
-        return lastState[button] && isButtonReleased(button);
-    }
-
-    /**
-        Updates the mouse state for single-clicking
-    */
-    void update() {
-        lastState[MouseButton.Left] = glfwGetMouseButton(window, MouseButton.Left) == GLFW_PRESS;
-        lastState[MouseButton.Middle] = glfwGetMouseButton(window, MouseButton.Middle) == GLFW_PRESS;
-        lastState[MouseButton.Right] = glfwGetMouseButton(window, MouseButton.Right) == GLFW_PRESS;
+        lastPos = vec2i(*x, *y);
+        return vec2(*x, *y);
     }
 }

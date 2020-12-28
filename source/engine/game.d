@@ -5,7 +5,7 @@
     Authors: Luna Nielsen
 */
 module engine.game;
-import bindbc.glfw;
+import bindbc.sdl;
 import engine;
 
 private double previousTime_;
@@ -46,12 +46,11 @@ void function() gameCleanup;
 */
 void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
     gameInit();
-    resetTime();
 
     framebuffer = new Framebuffer(GameWindow, viewportSize);
     while(!GameWindow.isExitRequested) {
 
-        currentTime_ = glfwGetTime();
+        currentTime_ = cast(double)SDL_GetPerformanceCounter()/cast(double)SDL_GetPerformanceFrequency();
         deltaTime_ = currentTime_-previousTime_;
         previousTime_ = currentTime_;
         
@@ -78,7 +77,6 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
         if (gamePostUpdate !is null) gamePostUpdate();
 
         // Update the mouse's state
-        Mouse.update();
         Input.update();
 
         // Swap buffers and update the window
@@ -126,13 +124,4 @@ double prevTime() {
 */
 double currTime() {
     return currentTime_;
-}
-
-/**
-    Resets the time scale
-*/
-void resetTime() {
-    glfwSetTime(0);
-    previousTime_ = 0;
-    currentTime_ = 0;
 }

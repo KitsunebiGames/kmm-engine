@@ -5,7 +5,7 @@
     Authors: Luna Nielsen
 */
 module engine.core.window;
-import bindbc.glfw;
+import bindbc.sdl;
 import bindbc.opengl;
 import engine.render : kmViewport;
 
@@ -19,7 +19,8 @@ static Window GameWindow;
 */
 class Window {
 private:
-    GLFWwindow* window;
+    SDL_Window* window;
+    SDL_GLContext ctx;
     string title_;
     int width_;
     int height_;
@@ -27,13 +28,16 @@ private:
     int fbWidth;
     int fbHeight;
 
+    bool fullscreen_;
+    bool shouldClose;
+
 public:
 
     /**
         Destructor
     */
     ~this() {
-        glfwDestroyWindow(window);
+        SDL_DestroyWindow(window);
     }
 
     /**
@@ -46,11 +50,18 @@ public:
         this.fbWidth = width;
         this.fbHeight = height;
 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE); // To make macOS happy
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-        window = glfwCreateWindow(640, 480, this.title_.ptr, null, null);
+        SDL_GL_SetAttribute( SDL_GLattr.SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
+        SDL_GL_SetAttribute( SDL_GLattr.SDL_GL_CONTEXT_MINOR_VERSION, 2 );
+        SDL_GL_SetAttribute( SDL_GLattr.SDL_GL_CONTEXT_PROFILE_MASK, SDL_GLprofile.SDL_GL_CONTEXT_PROFILE_COMPATIBILITY );
+        window = SDL_CreateWindow(
+            this.title_.ptr, 
+            SDL_WINDOWPOS_UNDEFINED, 
+            SDL_WINDOWPOS_UNDEFINED, 
+            width, 
+            height, 
+            SDL_WindowFlags.SDL_WINDOW_OPENGL | SDL_WindowFlags.SDL_WINDOW_RESIZABLE
+        );
+        ctx = SDL_GL_CreateContext(window);
         
     }
 
@@ -58,14 +69,14 @@ public:
         Hides the window
     */
     void hide() {
-        glfwHideWindow(window);
+        SDL_HideWindow(window);
     }
 
     /**
         Show window
     */
     void show() {
-        glfwShowWindow(window);
+        SDL_ShowWindow(window);
     }
 
     /**
@@ -80,7 +91,7 @@ public:
     */
     @property void title(string value) {
         this.title_ = value;
-        glfwSetWindowTitle(window, this.title_.ptr);
+        SDL_SetWindowTitle(window, this.title_.ptr);
     }
 
     /**
@@ -103,74 +114,76 @@ public:
     void resize(int width, int height) {
         this.width_ = width;
         this.height_ = height;
-        glfwSetWindowSize(window, width, height);
+        SDL_SetWindowSize(window, width, height);
     }
 
     /**
         Gets whether the window is fullscreen
     */
     bool fullscreen() {
-        return glfwGetWindowMonitor(window) !is null;
+        return fullscreen_;
     }
 
     /**
         Sets the window's fullscreen state
     */
     void fullscreen(bool value) {
-        if (this.fullscreen == value) return;
+        if (this.fullscreen_ == value) return;
 
-        // TODO: change state
-        // HACK: currently we're just setting the window as borderless
-        if (value) {
-            const(GLFWvidmode)* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            this.resize(mode.width, mode.height);
-            glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_FALSE);
-        } else {
-            glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_TRUE);
-        }
+        SDL_SetWindowFullscreen(window, value ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+        this.fullscreen_ = value;
     }
 
     /**
         poll for new window events
     */
     void update() {
-        glfwPollEvents();
-        glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+        SDL_PumpEvents();
+        SDL_GL_GetDrawableSize(window, &fbWidth, &fbHeight);
+
+
+        // Handle window close
+        SDL_Event ev;
+        while(SDL_PollEvent(&ev) == 1) {
+            if (ev.window.event == SDL_WindowEventID.SDL_WINDOWEVENT_CLOSE) {
+                close();
+            }
+        }
     }
 
     /**
         Set the close request flag
     */
     void close() {
-        glfwSetWindowShouldClose(window, 1);
+        shouldClose = true;
     }
 
     /**
         Gets whether the window has requested to close (aka the game is requested to exit)
     */
     bool isExitRequested() {
-        return cast(bool)glfwWindowShouldClose(window);
+        return shouldClose;
     }
 
     /**
         Makes the OpenGL context of the window current
     */
     void makeCurrent() {
-        glfwMakeContextCurrent(window);
+        SDL_GL_MakeCurrent(window, ctx);
     }
 
     /**
         Swaps the OpenGL buffers for the window
     */
     void swapBuffers() {
-        glfwSwapBuffers(window);
+        SDL_GL_SwapWindow(window);
     }
 
     /**
         Sets the swap interval, by default vsync
     */
     void setSwapInterval(SwapInterval interval = SwapInterval.VSync) {
-        glfwSwapInterval(cast(int)interval);
+        SDL_GL_SetSwapInterval(cast(int)interval);
     }
 
     /**
@@ -183,7 +196,7 @@ public:
     /**
         Gets the glfw window pointer
     */
-    GLFWwindow* winPtr() {
+    SDL_Window* winPtr() {
         return window;
     }
 }
@@ -193,5 +206,6 @@ public:
 */
 enum SwapInterval : int {
     Unlimited = 0,
-    VSync = 1
+    VSync = 1,
+    Adaptive = -1
 }
