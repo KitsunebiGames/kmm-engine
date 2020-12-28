@@ -195,7 +195,7 @@ public:
         enforce(err == FT_Err_Ok, "Error %s while loading font file".format(err));
 
         // Change size of text
-        this.changeSize(size);
+        this.setSize(size);
 
         // Initializes the texture
         this.init_(canvasSize);
@@ -220,7 +220,7 @@ public:
         enforce(err == FT_Err_Ok, "Error %s while loading font file".format(err));
 
         // Change size of text
-        this.changeSize(size);
+        this.setSize(size);
 
         // Initializes the texture
         this.init_(canvasSize);
@@ -232,9 +232,9 @@ public:
     //
 
     /**
-        Changes size of font
+        Sets size of font
     */
-    final void changeSize(int size) {
+    final void setSize(int size) {
 
         // Don't try to change size when it's the same
         if (size == this.size) return;

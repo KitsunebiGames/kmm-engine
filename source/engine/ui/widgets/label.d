@@ -25,7 +25,7 @@ protected:
             Code run when drawing
         */
         void onDraw() {
-            GameFont.changeSize(size);
+            GameFont.setSize(size);
             GameFont.draw(this.text, vec2(area.x, area.y));
             GameFont.flush();
         }
@@ -72,7 +72,7 @@ override:
         Area in which the widget cuts out child widgets
     */
     vec4i scissorArea() {
-        GameFont.changeSize(size);
+        GameFont.setSize(size);
         vec2 measure = GameFont.measure(text);
         vec2 pos = this.calculatedPosition();
         return vec4i(

@@ -1,32 +1,15 @@
 module app;
 import engine;
-
-void _init() {
-
-}
-
-void _update() {
-
-}
-
-void _cleanup() {
-
-}
-
-void _border() {
-
-}
-
-void _postUpdate() {
-
-}
+import game;
 
 int main() {
 
-    // Set 
+    // Set the function pointers
     gameInit = &_init;
     gameUpdate = &_update;
     gameCleanup = &_cleanup;
+    gameBorder = &_border;
+    gamePostUpdate = &_postUpdate;
 
     // Init engine start the game and then close the engine once the game quits
     initEngine();
