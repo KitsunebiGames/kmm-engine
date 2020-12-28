@@ -29,7 +29,7 @@ package(engine) static:
                     endTextInput();
                     break;
 
-                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_BACKSPACE && text.length > 0) {
+                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_BACKSPACE && text.length > 0 && !isComposing) {
 
                     if (selection == 0) {
 
@@ -48,7 +48,7 @@ package(engine) static:
                         selection = 0;
                     }
 
-                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_LEFT && text.length > 0 && (event.key.keysym.mod == SDL_Keymod.KMOD_LSHIFT || event.key.keysym.mod == SDL_Keymod.KMOD_RSHIFT)) {
+                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_LEFT && text.length > 0 && (event.key.keysym.mod == SDL_Keymod.KMOD_LSHIFT || event.key.keysym.mod == SDL_Keymod.KMOD_RSHIFT) && !isComposing) {
 
                     // TODO: allow backwards selection by shifting cursor?
 
@@ -58,7 +58,7 @@ package(engine) static:
                     // Move the selection by 1 UTF8 codepoint
                     selection -= strideBack(text, cursor+selection);
 
-                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_RIGHT && text.length > 0 && (event.key.keysym.mod == SDL_Keymod.KMOD_LSHIFT || event.key.keysym.mod == SDL_Keymod.KMOD_RSHIFT)) {
+                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_RIGHT && text.length > 0 && (event.key.keysym.mod == SDL_Keymod.KMOD_LSHIFT || event.key.keysym.mod == SDL_Keymod.KMOD_RSHIFT) && !isComposing) {
 
                     // Skip if we're already at end of string
                     if (cursor+selection == text.length) break;
@@ -66,7 +66,7 @@ package(engine) static:
                     // Move the selection by 1 UTF8 codepoint
                     selection += stride(text, cursor+selection);
 
-                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_LEFT && text.length > 0) {
+                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_LEFT && text.length > 0 && !isComposing) {
 
                     // Skip if we're already at beginning of string
                     if (cursor == 0) break;
@@ -77,7 +77,7 @@ package(engine) static:
                     // Moving cursor will reset selection
                     selection = 0;
 
-                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_RIGHT && text.length > 0) {
+                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_RIGHT && text.length > 0 && !isComposing) {
 
                     // Skip if we're already at end of string
                     if (cursor == text.length) break;
@@ -88,12 +88,12 @@ package(engine) static:
                     // Moving cursor will reset selection
                     selection = 0;
 
-                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_c && (event.key.keysym.mod == SDL_Keymod.KMOD_LCTRL || event.key.keysym.mod == SDL_Keymod.KMOD_RCTRL)) {
+                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_c && (event.key.keysym.mod == SDL_Keymod.KMOD_LCTRL || event.key.keysym.mod == SDL_Keymod.KMOD_RCTRL) && !isComposing) {
                     
                     // Copy text
                     SDL_SetClipboardText(text.ptr);
 
-                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_v && (event.key.keysym.mod == SDL_Keymod.KMOD_LCTRL || event.key.keysym.mod == SDL_Keymod.KMOD_RCTRL)) {
+                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_v && (event.key.keysym.mod == SDL_Keymod.KMOD_LCTRL || event.key.keysym.mod == SDL_Keymod.KMOD_RCTRL) && !isComposing) {
                     
                     // Skip if there's no text to paste, otherwise fetch text from clipboard
                     if (!SDL_HasClipboardText()) break;
