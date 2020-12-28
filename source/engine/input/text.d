@@ -116,6 +116,13 @@ public static:
     }
 
     /**
+        Gets whether the user is currently composing text via IME
+    */
+    bool isComposing() {
+        return composition.length > 0;
+    }
+
+    /**
         This resets the text buffer
 
         Starts text input mode
