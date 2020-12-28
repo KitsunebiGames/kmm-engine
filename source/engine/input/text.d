@@ -33,12 +33,36 @@ package(engine) static:
 
                     if (selection == 0) {
 
+                        // We don't want to delete past the beginning
+                        if (cursor == 0) break;
+
                         // Get amount of bytes in the UTF8 character
                         uint charWidth = strideBack(text, cursor);
 
                         // Remove it then update the cursor
-                        text = text[0..cursor-charWidth] ~ text[cursor+selection..$]; // Remove a character
+                        text = text[0..cursor-charWidth] ~ text[cursor..$]; // Remove a character
                         cursor = cursor-charWidth;
+
+                    } else {
+
+                        // In case of selection remove multiple
+                        // In this case the cursor should stay in the same place but the selection be reset
+                        text = text[0..cursor] ~ text[cursor+selection..$];
+                        selection = 0;
+                    }
+
+                } else if (event.key.keysym.sym == SDL_Keycode.SDLK_DELETE && text.length > 0 && !isComposing) {
+
+                    if (selection == 0) {
+
+                        // We don't want to delete past the end
+                        if (cursor == text.length) break;
+
+                        // Get amount of bytes in the UTF8 character
+                        uint charWidth = stride(text, cursor);
+
+                        // Remove it then update the cursor
+                        text = text[0..cursor] ~ text[cursor+charWidth..$]; // Remove a character
 
                     } else {
 
