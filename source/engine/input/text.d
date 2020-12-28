@@ -145,7 +145,7 @@ package(engine) static:
 
                 // Replace selection if need be
                 text = text[0..cursor] ~ composedText ~ text[cursor+selection..$];
-                cursor += stride(composedText);
+                cursor += composedText.length;
 
                 // Reset selection after this.
                 selection = 0;
@@ -154,14 +154,6 @@ package(engine) static:
             // We only wanna handle textevents
             default: break;
         }        
-    }
-
-    void beginText() {
-        if (isReadingText) SDL_StartTextInput();
-    }
-
-    void endText() {
-        if (isReadingText) SDL_StopTextInput();
     }
 
 public static:
@@ -231,6 +223,7 @@ public static:
     void startTextInput() {
         text = "";
         isReadingText = true;
+        SDL_StartTextInput();
     }
 
     /**
@@ -239,6 +232,7 @@ public static:
     string endTextInput() {
         string outText = text.idup;
         isReadingText = false;
+        SDL_StopTextInput();
 
         // Reset candidate and text
         cselection = 0;
