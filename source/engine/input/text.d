@@ -133,7 +133,7 @@ package(engine) static:
             
             // Handle IME
             case SDL_EventType.SDL_TEXTEDITING:
-                composition = cast(string)event.edit.text.ptr.fromStringz;
+                composition = cast(string)(event.edit.text.dup.ptr).fromStringz;
                 ccursor = event.edit.start;
                 cselection = event.edit.length;
                 break;
@@ -187,6 +187,13 @@ public static:
         The current text
     */
     string text;
+
+    /**
+        Gets text with composition string spliced in
+    */
+    string textWithComposition() {
+        return text[0..cursor] ~ composition ~ text[cursor+cselection..$];
+    }
 
     /**
         Whether pressing RETURN will end the input mode
