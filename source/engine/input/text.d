@@ -140,12 +140,11 @@ package(engine) static:
 
             // Handle input
             case SDL_EventType.SDL_TEXTINPUT:
-                // Get the composed text
-                string composedText = composition.ptr.fromStringz;
+                string cText = cast(string)(event.text.text.dup.ptr).fromStringz;
 
                 // Replace selection if need be
-                text = text[0..cursor] ~ composedText ~ text[cursor+selection..$];
-                cursor += composedText.length;
+                text = text[0..cursor] ~ cText ~ text[cursor+selection..$];
+                cursor += cText.length;
 
                 // Reset selection after this.
                 selection = 0;
