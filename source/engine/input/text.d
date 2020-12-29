@@ -227,8 +227,8 @@ public static:
 
         Starts text input mode
     */
-    void startTextInput() {
-        text = "";
+    void startTextInput(string startText = "") {
+        text = startText;
         isReadingText = true;
         SDL_StartTextInput();
     }
