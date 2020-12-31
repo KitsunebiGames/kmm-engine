@@ -212,14 +212,14 @@ private:
 
 public:
     static KeyboardState* getState() {
-        int* elm;
-        ubyte* arr = SDL_GetKeyboardState(elm);
+        int elm;
+        ubyte* arr = SDL_GetKeyboardState(&elm);
 
         // If the state is null just return the previous state
-        if (elm is null) return prevState;
+        if (arr is null) return prevState;
 
         // Returns the state
-        prevState = new KeyboardState(arr, *elm);
+        prevState = new KeyboardState(arr, elm);
         return prevState;
     }
 }
