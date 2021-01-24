@@ -105,9 +105,52 @@ private:
     GLuint id;
     int width_;
     int height_;
+    bool compressed;
 
     GLuint colorMode;
+    GLuint iColorMode;
     int alignment;
+
+    GLuint getColorModeFor(int channels) {
+        switch(channels) {
+            default: throw new Exception("Invalid color channel count");
+            case 1: return GL_RED;
+            case 2: return GL_RG;
+            case 3: return GL_RGB;
+            case 4: return GL_RGBA;
+        }
+    }
+
+    void setInternalColorMode() {
+        switch(colorMode) {
+            default: assert(0);
+
+            // 1 bit texture compression messes up bad
+            // 1 bit textures will not be compressed.
+            case GL_RED:
+                AppLog.warn("Texture", "Attempted to compress 1 bit texture, this is not supported.");
+                iColorMode = colorMode; 
+                return;
+
+            // Worse compression methods here but it makes sense since there's less data
+            case GL_RG:
+                AppLog.info("debug", "colorMode = RG, compressed = %s", compressed);
+                iColorMode = compressed ? GL_COMPRESSED_RG_RGTC2 : colorMode; 
+                return;
+
+            // We're using OpenGL 4.2, so we can use ETC2 or BC7 compression internally
+            case GL_RGB:
+                AppLog.info("debug", "colorMode = RGB, compressed = %s", compressed);
+                iColorMode = compressed ? GL_COMPRESSED_RGB8_ETC2 : colorMode; 
+                return;
+
+            case GL_RGBA: 
+                AppLog.info("debug", "colorMode = RGBA, compressed = %s", compressed);
+                iColorMode = compressed ? GL_COMPRESSED_RGBA_BPTC_UNORM  : colorMode; 
+                return;
+        }
+    }
+
 
 public:
 
@@ -119,7 +162,7 @@ public:
         * TGA 8-bit non-palleted
         * JPEG baseline
     */
-    this(string file) {
+    this(string file, bool compressed = true) {
 
         // Load image from disk, as RGBA 8-bit
         IFImage image = read_image(file, 4, 8);
@@ -127,36 +170,38 @@ public:
         scope(exit) image.free();
 
         // Load in image data to OpenGL
-        this(image.buf8, image.w, image.h);
+        this(image.buf8, image.w, image.h, 4, 4, compressed);
     }
 
     /**
         Creates a texture from a ShallowTexture
     */
-    this(ShallowTexture shallow) {
-        this(shallow.data, shallow.width, shallow.height);
+    this(ShallowTexture shallow, bool compressed = true) {
+        this(shallow.data, shallow.width, shallow.height, 4, 4, compressed);
     }
 
     /**
         Creates a new empty texture
     */
-    this(int width, int height, GLuint mode = GL_RGBA, int alignment = 4) {
+    this(int width, int height, int channels = 4, int alignment = 4, bool compressed = true) {
 
         // Create an empty texture array with no data
         ubyte[] empty = new ubyte[width_*height_*alignment];
 
         // Pass it on to the other texturing
-        this(empty, width, height, mode, alignment);
+        this(empty, width, height, channels, alignment, compressed);
     }
 
     /**
         Creates a new texture from specified data
     */
-    this(ubyte[] data, int width, int height, GLuint mode = GL_RGBA, int alignment = 4) {
-        this.colorMode = mode;
+    this(ubyte[] data, int width, int height, int channels = 4, int alignment = 4, bool compressed = true) {
+        this.colorMode = getColorModeFor(channels);
         this.alignment = alignment;
         this.width_ = width;
         this.height_ = height;
+        this.compressed = compressed;
+        this.setInternalColorMode();
         
         // Generate OpenGL texture
         glGenTextures(1, &id);
@@ -179,6 +224,13 @@ public:
     */
     int height() {
         return height_;
+    }
+
+    /**
+        Gets whether the texture is compressed
+    */
+    bool isCompressed() {
+        return compressed;
     }
 
     /**
@@ -205,7 +257,7 @@ public:
     void setData(ubyte[] data) {
         this.bind();
         glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
-        glTexImage2D(GL_TEXTURE_2D, 0, colorMode, width_, height_, 0, colorMode, GL_UNSIGNED_BYTE, data.ptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, iColorMode, width_, height_, 0, colorMode, GL_UNSIGNED_BYTE, data.ptr);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
 

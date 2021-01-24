@@ -151,7 +151,7 @@ private:
         FT_Select_Charmap(fontFace, FT_ENCODING_UNICODE);
 
         // Create the texture
-        fontTexture = new Texture(canvasSize, canvasSize, GL_RED, 1);
+        fontTexture = new Texture(canvasSize, canvasSize, 1, 1);
         fontPacker = new TexturePacker(vec2i(canvasSize, canvasSize));
 
         glBindVertexArray(vao);

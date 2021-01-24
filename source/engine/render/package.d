@@ -7,6 +7,7 @@
     Authors: Luna Nielsen
 */
 module engine.render;
+import std.string;
 public import bindbc.opengl;
 public import engine.render.shader;
 public import engine.render.texture;
@@ -14,6 +15,10 @@ public import engine.render.batcher;
 public import engine.render.fbo;
 
 void initRender() {
+
+    glVersion = cast(string)glGetString(GL_VERSION).fromStringz;
+    glVendor = cast(string)glGetString(GL_VENDOR).fromStringz;
+    glGPU = cast(string)glGetString(GL_RENDERER).fromStringz;
     
     // OpenGL prep stuff
     glEnable(GL_BLEND);
@@ -30,6 +35,10 @@ private int viewportX;
 private int viewportY;
 private int viewportW;
 private int viewportH;
+
+private string glVersion;
+private string glVendor;
+private string glGPU;
 
 /**
     Sets the viewport
@@ -71,4 +80,25 @@ int kmViewportWidth() {
 */
 int kmViewportHeight() {
     return viewportH;
+}
+
+/**
+    Returns the OpenGL version
+*/
+string kmGLVersion() {
+    return glVersion;
+}
+
+/**
+    Gets the vendor of the GPU
+*/
+string kmGLVendor() {
+    return glVendor;
+}
+
+/**
+    Gets the name of the GPU which is rendering the game
+*/
+string kmGLGPU() {
+    return glGPU;
 }
