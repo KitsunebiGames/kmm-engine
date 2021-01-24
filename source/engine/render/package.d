@@ -19,6 +19,7 @@ void initRender() {
     glVersion = cast(string)glGetString(GL_VERSION).fromStringz;
     glVendor = cast(string)glGetString(GL_VENDOR).fromStringz;
     glGPU = cast(string)glGetString(GL_RENDERER).fromStringz;
+    glGLSLVersion = cast(string)glGetString(GL_SHADING_LANGUAGE_VERSION).fromStringz;
     
     // OpenGL prep stuff
     glEnable(GL_BLEND);
@@ -39,6 +40,7 @@ private int viewportH;
 private string glVersion;
 private string glVendor;
 private string glGPU;
+private string glGLSLVersion;
 
 /**
     Sets the viewport
@@ -101,4 +103,11 @@ string kmGLVendor() {
 */
 string kmGLGPU() {
     return glGPU;
+}
+
+/**
+    Gets the primary GLSL version the GPU supports
+*/
+string kmGLSLVersion() {
+    return glGLSLVersion;
 }
