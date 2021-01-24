@@ -74,8 +74,8 @@ public:
     /**
         Add texture to the atlas from a file
     */
-    void add(string name, string file, size_t atlas=0) {
-        add(name, ShallowTexture(file), atlas);
+    AtlasIndex add(string name, string file, size_t atlas=0) {
+        return add(name, ShallowTexture(file), atlas);
     }
     
     /**
@@ -91,13 +91,13 @@ public:
     /**
         Add texture to the atlas collection
     */
-    void add(string name, ShallowTexture shallowTexture, size_t atlas=0) {
+    AtlasIndex add(string name, ShallowTexture shallowTexture, size_t atlas=0) {
         enforce(name !in texTable, "Texture with name '%s' is already in the atlas collection".format(name));
 
         // Add new atlas
         if (atlas >= atlasses.length) {
             AppLog.info("AtlasCollection", "All atlases were out of space, creating new atlas %s...", atlasses.length);
-            atlasses ~= new TextureAtlas(vec2i(4096, 4096));
+            atlasses ~= new TextureAtlas(vec2i(8192, 8192));
             atlasses[$-1].setFiltering(defaultFilter);
         }
 
@@ -108,13 +108,12 @@ public:
         if (!area.area.isFinite) {
 
             // Try the next atlas
-            add(name, shallowTexture, atlas+1);
-            return;
+            return add(name, shallowTexture, atlas+1);
         }
 
         // Put the texture and its uvs in to the table
         texTable[name] = AtlasIndex(atlasses[atlas], area.uv, area.area);
-
+        return texTable[name]; 
     }
 
     /**
