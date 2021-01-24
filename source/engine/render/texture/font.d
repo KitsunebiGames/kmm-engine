@@ -41,8 +41,15 @@ private {
     }
 }
 
+private string chosenFont;
+
 /**
-    The game's public font
+    Public instance of Kosugi Maru
+*/
+Font[string] GameFonts;
+
+/**
+    The "default" font
 */
 Font GameFont;
 
@@ -63,7 +70,53 @@ void initFontSystem() {
     vp = fontShader.getUniformLocation("vp");
 
     // The game's font
-    GameFont = new Font(cast(ubyte[])import("fonts/KosugiMaru.ttf"), 24);
+    GameFonts["KosugiMaru"] = new Font(cast(ubyte[])import("fonts/KosugiMaru.ttf"), 24);
+    GameFonts["PixelMPlus10"] = new Font(cast(ubyte[])import("fonts/PixelMPlus10.ttf"), 24);
+
+    kmSwitchFont("PixelMPlus10");
+}
+
+/**
+    Get the default size for the specified font
+*/
+int kmGetDefaultFontSizeFor(string name) {
+    switch(name) {
+        case "KosugiMaru": return 24;
+        case "PixelMPlus10": return 10;
+        default: return 16;
+    }
+}
+
+/**
+    Gets the default size for the current default font
+*/
+int kmGetDefaultFontSize() {
+    switch(chosenFont) {
+        case "kosugimaru": return 24;
+        case "pixelmplus": return 10;
+        default: return 16;
+    }
+}
+
+/**
+    Switch the default font
+*/
+void kmSwitchFont(string name) {
+    chosenFont = name;
+    switch(name) {
+        case "kosugimaru": 
+            GameFont = GameFonts["KosugiMaru"];
+            break;
+        
+        case "pixelmplus":
+            GameFont = GameFonts["PixelMPlus10"];
+            break;
+
+        default: 
+            GameFont = GameFonts["PixelMPlus10"];
+            chosenFont = "pixelmplus";
+            break;
+    }
 }
 
 /**
@@ -153,6 +206,9 @@ private:
         // Create the texture
         fontTexture = new Texture(canvasSize, canvasSize, 1, 1);
         fontPacker = new TexturePacker(vec2i(canvasSize, canvasSize));
+        
+        // Make sure they are point filtered
+        fontTexture.setFiltering(Filtering.Point);
 
         glBindVertexArray(vao);
         glGenBuffers(1, &buffer);
@@ -333,6 +389,49 @@ public:
             draw(c, next, vec2(0), 0, color);
             next.x += glyphs[idx].advance.x;
         }
+    }
+
+    /**
+        Basic string draw function with outline
+    */
+    void drawWithOutline(dstring text, vec2 position, vec4 color=vec4(1), vec4 outlineColor=vec4(0,0,0,1)) {
+        vec2 next = position;
+        size_t line;
+
+        foreach(dchar c; text) {  
+
+            // Skip newline
+            if (c == '\n') {
+                line++;
+                next.x = position.x;
+                next.y += metrics.y;
+                continue;
+            }
+
+            auto idx = GlyphIndex(c, size);
+                  
+            // Load character if neccesary
+            if (idx !in glyphs) {
+                genGlyphFor(c);
+
+                // At this point if the glyph does not exist, skip it
+                if (idx !in glyphs) continue;
+            }
+
+            drawWithOutline(c, next, vec2(0), 0, color, outlineColor);
+            next.x += glyphs[idx].advance.x;
+        }
+    }
+
+    /**
+        Draws a character with a 1x1 outline
+    */
+    void drawWithOutline(dchar c, vec2 position, vec2 origin=vec2(0), float rotation=0, vec4 color=vec4(1), vec4 outlineColor=vec4(0,0,0,1)) {
+        draw(c, vec2(position.x-1, position.y), origin, rotation, outlineColor);
+        draw(c, vec2(position.x+1, position.y), origin, rotation, outlineColor);
+        draw(c, vec2(position.x, position.y-1), origin, rotation, outlineColor);
+        draw(c, vec2(position.x, position.y+1), origin, rotation, outlineColor);
+        draw(c, position, origin, rotation, color);
     }
 
     /**
