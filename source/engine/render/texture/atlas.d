@@ -112,8 +112,9 @@ public:
         }
 
         // Put the texture and its uvs in to the table
-        texTable[name] = AtlasIndex(atlasses[atlas], area.uv, area.area);
-        return texTable[name]; 
+        AtlasIndex idx = AtlasIndex(atlasses[atlas], area.uv, area.area);
+        texTable[name] = idx;
+        return idx; 
     }
 
     /**
