@@ -152,7 +152,7 @@ public:
 
         // Get the area of the texture with a tiny bit cut off to avoid textures bleeding in to each other
         // TODO: add a 1x1 px transparent border around textures instead?
-        enum cutoffOffset = 0.8;
+        enum cutoffOffset = 0.05;
         enum cutoffAmount = cutoffOffset*2;
 
         vec4 uvArea = vec4(
@@ -203,16 +203,11 @@ public:
             cutout = vec4(0, fbo.realHeight, fbo.realWidth, -fbo.realHeight);
         }
 
-        // Get the area of the texture with a tiny bit cut off to avoid textures bleeding in to each other
-        // TODO: add a 1x1 px transparent border around textures instead?
-        enum cutoffOffset = 0.8;
-        enum cutoffAmount = cutoffOffset*2;
-
         vec4 uvArea = vec4(
-            (flip & SpriteFlip.Horizontal) > 0 ? (cutout.x+cutout.z)-cutoffAmount : (cutout.x)+cutoffOffset,
-            (flip & SpriteFlip.Vertical)   > 0 ? (cutout.y+cutout.w)-cutoffAmount : (cutout.y)+cutoffOffset,
-            (flip & SpriteFlip.Horizontal) > 0 ? (cutout.x)+cutoffOffset : (cutout.x+cutout.z)-cutoffAmount,
-            (flip & SpriteFlip.Vertical)   > 0 ? (cutout.y)+cutoffOffset : (cutout.y+cutout.w)-cutoffAmount,
+            (flip & SpriteFlip.Horizontal) > 0 ? (cutout.x+cutout.z) : (cutout.x),
+            (flip & SpriteFlip.Vertical)   > 0 ? (cutout.y+cutout.w) : (cutout.y),
+            (flip & SpriteFlip.Horizontal) > 0 ? (cutout.x) : (cutout.x+cutout.z),
+            (flip & SpriteFlip.Vertical)   > 0 ? (cutout.y) : (cutout.y+cutout.w),
         );
 
         // Triangle 1
@@ -284,7 +279,7 @@ public:
             GL_FLOAT,
             GL_FALSE,
             DataLength*GLfloat.sizeof,
-            cast(GLvoid*)(UVSize*GLfloat.sizeof),
+            cast(GLvoid*)(VecSize*GLfloat.sizeof),
         );
 
         // Color buffer
