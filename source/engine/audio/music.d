@@ -12,6 +12,19 @@ import engine.math;
 import std.math : isFinite;
 import engine;
 import events;
+import containers.list;
+
+private List!Music playingMusic;
+
+/**
+    Stops all music
+*/
+void kmStopAllMusic() {
+    foreach(music; playingMusic) {
+        if (music.isPlaying()) music.stop();
+    }
+    playingMusic.clear();
+}
 
 /**
     A stream of audio that can be played
@@ -166,6 +179,7 @@ public:
         running = true;
         playerThread = new Thread(&playThread);
         playerThread.start();
+        playingMusic.add(this);
     }
 
     /**
@@ -206,6 +220,7 @@ public:
             playerThread.join();
             playerThread = null;
         }
+        playingMusic.remove(this);
     }
 
     /**

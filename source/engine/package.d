@@ -68,6 +68,10 @@ void initEngine() {
     Closes the engine and relases libraries, etc.
 */
 void closeEngine() {
+
+    // Stop music when game exits
+    kmStopAllMusic();
+
     import core.memory : GC;
     destroy(GameWindow);
 	destroy(AppLog);
