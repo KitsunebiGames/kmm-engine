@@ -7,37 +7,45 @@
 module engine.game;
 import bindbc.sdl;
 import engine;
+import engine.config;
 
 private double previousTime_;
 private double currentTime_;
 private double deltaTime_;
+
+private double timeAccumulator;
 
 private Framebuffer framebuffer;
 
 /**
     Function run when the game is to initialize
 */
-void function() gameInit;
+void function() kmInit;
 
 /**
     Function run when the game is to update
 */
-void function() gameUpdate;
+void function() kmUpdate;
+
+/**
+    Fixed timestep updating
+*/
+void function() kmFixedUpdate;
 
 /**
     Function run after the main rendering has happened, Used to draw borders for the gameplay
 */
-void function() gameBorder;
+void function() kmBorder;
 
 /**
     Function run after updates and rendering of the game
 */
-void function() gamePostUpdate;
+void function() kmPostUpdate;
 
 /**
     Function run when the game is to clean up
 */
-void function() gameCleanup;
+void function() kmCleanup;
 
 /**
     Starts the game loop
@@ -45,7 +53,7 @@ void function() gameCleanup;
     viewportSize sets the desired viewport size for the framebuffer, defaults to 1080p (1920x1080)
 */
 void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
-    gameInit();
+    kmInit();
 
     framebuffer = new Framebuffer(GameWindow, viewportSize);
     while(!GameWindow.isExitRequested) {
@@ -65,7 +73,14 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // Update and render the game
-            gameUpdate();
+            kmUpdate();
+
+            // Fixed timestep updates
+            timeAccumulator += deltaTime();
+            while(timeAccumulator > KM_TIMESTEP) {
+                timeAccumulator -= KM_TIMESTEP;
+                kmFixedUpdate();
+            }
 
         // Unbind our framebuffer
         framebuffer.unbind();
@@ -75,9 +90,9 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw border, framebuffer and post update content
-        if (gameBorder !is null) gameBorder();
+        if (kmBorder !is null) gameBorder();
         framebuffer.renderToFit();
-        if (gamePostUpdate !is null) gamePostUpdate();
+        if (kmPostUpdate !is null) gamePostUpdate();
 
         // Update the mouse's state
         Input.update();
@@ -103,7 +118,7 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
     GameStateManager.popAll();
 
     // Game cleanup
-    gameCleanup();
+    kmCleanup();
 }
 
 /**
@@ -118,6 +133,13 @@ void setViewport(vec2i size) {
 */
 vec2i getViewport() {
     return framebuffer.size;
+}
+
+/**
+    Fixed timestep
+*/
+double fixedDelta() {
+    return KM_TIMESTEP;
 }
 
 /**
