@@ -77,8 +77,10 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
 
             // Fixed timestep updates
             timeAccumulator += deltaTime();
-            while(timeAccumulator > KM_TIMESTEP) {
+            float tTimeAcc = 0;
+            while(timeAccumulator > KM_TIMESTEP && tTimeAcc < KM_MAX_TIMESTEP) {
                 timeAccumulator -= KM_TIMESTEP;
+                tTimeAcc += KM_TIMESTEP;
                 kmFixedUpdate();
             }
 
@@ -90,9 +92,9 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw border, framebuffer and post update content
-        if (kmBorder !is null) gameBorder();
+        if (kmBorder !is null) kmBorder();
         framebuffer.renderToFit();
-        if (kmPostUpdate !is null) gamePostUpdate();
+        if (kmPostUpdate !is null) kmPostUpdate();
 
         // Update the mouse's state
         Input.update();
@@ -124,14 +126,14 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
 /**
     Resizes the game's viewport
 */
-void setViewport(vec2i size) {
+void kmSetViewport(vec2i size) {
     framebuffer.resize(size);
 }
 
 /**
     Gets the size of the framebuffer
 */
-vec2i getViewport() {
+vec2i kmGetViewport() {
     return framebuffer.size;
 }
 
