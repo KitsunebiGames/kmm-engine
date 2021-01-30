@@ -418,7 +418,8 @@ public:
                 if (idx !in glyphs) continue;
             }
 
-            drawWithOutline(c, next, vec2(0), 0, color, outlineColor);
+            drawOutline(c, next, vec2(0), 0, outlineColor);
+            draw(c, next, vec2(0), 0, color);
             next.x += glyphs[idx].advance.x;
         }
     }
@@ -426,12 +427,11 @@ public:
     /**
         Draws a character with a 1x1 outline
     */
-    void drawWithOutline(dchar c, vec2 position, vec2 origin=vec2(0), float rotation=0, vec4 color=vec4(1), vec4 outlineColor=vec4(0,0,0,1)) {
+    void drawOutline(dchar c, vec2 position, vec2 origin=vec2(0), float rotation=0, vec4 outlineColor=vec4(0,0,0,1)) {
         draw(c, vec2(position.x-1, position.y), origin, rotation, outlineColor);
         draw(c, vec2(position.x+1, position.y), origin, rotation, outlineColor);
         draw(c, vec2(position.x, position.y-1), origin, rotation, outlineColor);
         draw(c, vec2(position.x, position.y+1), origin, rotation, outlineColor);
-        draw(c, position, origin, rotation, color);
     }
 
     /**
