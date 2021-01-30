@@ -8,7 +8,7 @@ module engine.audio.mixer;
 import engine.core;
 import engine.math;
 
-private float mainGain;
+private float mainGain = 1;
 private float[string] channelGains;
 
 /**
