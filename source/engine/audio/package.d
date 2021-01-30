@@ -10,6 +10,7 @@ module engine.audio;
 public import engine.audio.astream;
 public import engine.audio.music;
 public import engine.audio.sound;
+public import engine.audio.mixer;
 import bindbc.openal;
 import engine.math;
 

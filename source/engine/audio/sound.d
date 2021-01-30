@@ -6,6 +6,7 @@
 */
 module engine.audio.sound;
 import engine.audio.astream;
+import engine.audio.mixer;
 import bindbc.openal;
 import engine.math;
 
@@ -17,6 +18,8 @@ private:
     ALuint bufferId;
     ALuint sourceId;
 
+    string mixerChannel;
+
 public:
     ~this() {
         alDeleteSources(1, &sourceId);
@@ -26,14 +29,14 @@ public:
     /**
         Construct a sound from a file path
     */
-    this(string file) {
-        this(open(file));
+    this(string file, string channel=null) {
+        this(open(file), channel);
     }
 
     /**
         Construct a sound
     */
-    this(AudioStream stream) {
+    this(AudioStream stream, string channel=null) {
 
         // Generate buffer
         alGenBuffers(1, &bufferId);
@@ -44,7 +47,9 @@ public:
         alGenSources(1, &sourceId);
         alSourcei(sourceId, AL_BUFFER, bufferId);
         alSourcef(sourceId, AL_PITCH, 1);
-        alSourcef(sourceId, AL_GAIN, 0.5);
+        alSourcef(sourceId, AL_GAIN, 1*kmMixerGetGainFor(mixerChannel));
+
+        mixerChannel = channel;
     }
 
     /**
@@ -57,12 +62,25 @@ public:
         alSourcePlay(sourceId);
     }
 
+    /**
+        Sets the mixer channel this sound plays through
+    */
+    void setChannel(string name) {
+        mixerChannel = name;
+    }
+
+    /**
+        Sets the pitch for the sound
+    */
     void setPitch(float pitch) {
         alSourcef(sourceId, AL_PITCH, pitch);
     }
 
+    /**
+        Sets the gain for the sound
+    */
     void setGain(float gain) {
-        alSourcef(sourceId, AL_GAIN, gain);
+        alSourcef(sourceId, AL_GAIN, gain*kmMixerGetGainFor(mixerChannel));
     }
 
     /**

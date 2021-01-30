@@ -41,6 +41,7 @@ private:
 
     bool running;
     bool looping;
+    string mixerChannel;
 
     Thread playerThread;
     void playThread() {
@@ -140,17 +141,18 @@ public:
     /**
         Construct a sound from a file path
     */
-    this(string file) {
-        this(open(file));
+    this(string file, string channel = null) {
+        this(open(file), channel);
     }
 
     /**
         Construct a sound
     */
-    this(AudioStream stream) {
+    this(AudioStream stream, string channel = null) {
 
-        // Generate buffer
+        // Generate buffer and set mixer channel
         this.stream = stream;
+        this.mixerChannel = channel;
 
         // Generate source
         alGenSources(1, &sourceId);
@@ -173,13 +175,20 @@ public:
 
         // Set music start values if needed
         if (pitch.isFinite) alSourcef(sourceId, AL_PITCH, pitch);
-        if (gain.isFinite) alSourcef(sourceId, AL_GAIN, gain);
+        if (gain.isFinite) alSourcef(sourceId, AL_GAIN, gain*kmMixerGetGainFor(mixerChannel));
 
         // Start thread and play music
         running = true;
         playerThread = new Thread(&playThread);
         playerThread.start();
         playingMusic.add(this);
+    }
+
+    /**
+        Sets the mixer channel of this music
+    */
+    void setChannel(string name) {
+        mixerChannel = name;
     }
 
     /**
@@ -193,7 +202,7 @@ public:
         Set the pitch of this music
     */
     void setGain(float gain) {
-        alSourcef(sourceId, AL_GAIN, gain);
+        alSourcef(sourceId, AL_GAIN, gain*kmMixerGetGainFor(mixerChannel));
     }
 
     /**
