@@ -147,6 +147,7 @@ private:
     Texture fontTexture;
     Glyph[GlyphIndex] glyphs;
     int size;
+    bool hasVertical;
 
     // Generates glyph for the specified character
     bool genGlyphFor(dchar c) {
@@ -249,6 +250,9 @@ public:
 
         enforce(err != FT_Err_Unknown_File_Format, "Unknown file format for %s".format(file));
         enforce(err == FT_Err_Ok, "Error %s while loading font file".format(err));
+
+        // Check whether font supports vertical text
+        hasVertical = FT_HAS_VERTICAL(fontFace);
 
         // Change size of text
         this.setSize(size);
@@ -360,9 +364,15 @@ public:
     //
 
     /**
-        Basic string draw function
+        Basic string draw function for right-to-left vertical text
+
+        If font does not have vertical metrics the implementation will try to estimate some
+        rounded to the nearest pixel
     */
-    void draw(dstring text, vec2 position, vec4 color=vec4(1)) {
+    void drawVertical(bool outline=false)(dstring text, vec2 position, vec4 color=vec4(1), vec4 outlineColor=vec4(0,0,0,1)) {
+        
+        position.x -= metrics.x;
+        
         vec2 next = position;
         size_t line;
 
@@ -371,8 +381,8 @@ public:
             // Skip newline
             if (c == '\n') {
                 line++;
-                next.x = position.x;
-                next.y += metrics.y;
+                next.x -= metrics.x;
+                next.y = position.y;
                 continue;
             }
 
@@ -386,15 +396,22 @@ public:
                 if (idx !in glyphs) continue;
             }
 
+            static if (outline) drawOutline(c, next, vec2(0), 0, outlineColor);
             draw(c, next, vec2(0), 0, color);
-            next.x += glyphs[idx].advance.x;
+            
+            if (hasVertical) {
+                next.y += glyphs[idx].advance.y;
+            } else {
+                next.y += round(metrics.y*1.05);
+            }
         }
     }
+    alias drawVerticalWithOutline = drawVertical!true;
 
     /**
-        Basic string draw function with outline
+        Basic string draw function
     */
-    void drawWithOutline(dstring text, vec2 position, vec4 color=vec4(1), vec4 outlineColor=vec4(0,0,0,1)) {
+    void draw(bool outline=false)(dstring text, vec2 position, vec4 color=vec4(1), vec4 outlineColor=vec4(0,0,0,1)) {
         vec2 next = position;
         size_t line;
 
@@ -418,11 +435,13 @@ public:
                 if (idx !in glyphs) continue;
             }
 
-            drawOutline(c, next, vec2(0), 0, outlineColor);
+            static if (outline) drawOutline(c, next, vec2(0), 0, outlineColor);
             draw(c, next, vec2(0), 0, color);
             next.x += glyphs[idx].advance.x;
         }
     }
+    
+    alias drawWithOutline = draw!true;
 
     /**
         Draws a character with a 1x1 outline
