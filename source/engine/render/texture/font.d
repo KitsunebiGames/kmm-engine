@@ -70,8 +70,8 @@ void initFontSystem() {
     vp = fontShader.getUniformLocation("vp");
 
     // The game's font
-    GameFonts["KosugiMaru"] = new Font(cast(ubyte[])import("fonts/KosugiMaru.ttf"), 24);
-    GameFonts["PixelMPlus10"] = new Font(cast(ubyte[])import("fonts/PixelMPlus10.ttf"), 24);
+    GameFonts["KosugiMaru"] = new Font("Kosugi Maru", cast(ubyte[])import("fonts/KosugiMaru.ttf"), 24);
+    GameFonts["PixelMPlus10"] = new Font("PixelM+ 10", cast(ubyte[])import("fonts/PixelMPlus10.ttf"), 24);
 
     kmSwitchFont("PixelMPlus10");
 }
@@ -148,6 +148,8 @@ private:
     Glyph[GlyphIndex] glyphs;
     int size;
     bool hasVertical;
+
+    string name;
 
     // Generates glyph for the specified character
     bool genGlyphFor(dchar c) {
@@ -245,7 +247,10 @@ public:
 
         canvasSize specifies how big the texture for the font will be.
     */
-    this(string file, int size, int canvasSize = 4096) {
+    this(string name, string file, int size, int canvasSize = 4096) {
+        this.name = name;
+        
+        AppLog.info("FontLoader", "Loading [%s] from file [%s]...", name, file);
         int err = FT_New_Face(lib, file.toStringz, 0, &fontFace);
 
         enforce(err != FT_Err_Unknown_File_Format, "Unknown file format for %s".format(file));
@@ -253,6 +258,7 @@ public:
 
         // Check whether font supports vertical text
         hasVertical = FT_HAS_VERTICAL(fontFace);
+        if (!hasVertical) AppLog.warn("FontLoader", "[%s] does not have vertical font metrics! Font metrics will be estimated, this may be innacurate.", name);
 
         // Change size of text
         this.setSize(size);
@@ -266,18 +272,23 @@ public:
 
         canvasSize specifies how big the texture for the font will be.
     */
-    this(ubyte[] memFace, int size, int canvasSize = 4096) {
+    this(string name, ubyte[] memFace, int size, int canvasSize = 4096) {
+        this.name = name;
 
         // Copy data from memFace
         import std.algorithm.mutation : copy;
         faceMemory = new ubyte[memFace.length];
         copy(memFace, faceMemory);
 
-        AppLog.info("FontLoader", "Loading font from memory with size %s", memFace.length);
+        AppLog.info("FontLoader", "Loading [%s] from memory with size %s", name, memFace.length);
         int err = FT_New_Memory_Face(lib, faceMemory.ptr, cast(int)faceMemory.length, 0, &fontFace);
 
         enforce(err != FT_Err_Unknown_File_Format, "Unknown file format");
         enforce(err == FT_Err_Ok, "Error %s while loading font file".format(err));
+
+        // Check whether font supports vertical text
+        hasVertical = FT_HAS_VERTICAL(fontFace);
+        if (!hasVertical) AppLog.warn("FontLoader", "[%s] does not have vertical font metrics! Font metrics will be estimated, this may be innacurate.", name);
 
         // Change size of text
         this.setSize(size);
@@ -368,6 +379,9 @@ public:
 
         If font does not have vertical metrics the implementation will try to estimate some
         rounded to the nearest pixel
+
+        This only works for languages where text is monspaced (Japanese and Chinese for example)
+        As well only languages that are read right-to-left when vertical.
     */
     void drawVertical(bool outline=false)(dstring text, vec2 position, vec4 color=vec4(1), vec4 outlineColor=vec4(0,0,0,1)) {
         
