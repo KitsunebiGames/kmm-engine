@@ -10,7 +10,7 @@ import std.utf : toUTF32, toUTF16, toUTF8;
 /**
     Convert any type of string to a engine usable string
 */
-string toDString(T)(T str) if (isString!T) {
+string kmToDString(T)(T str) if (isString!T) {
     static if (is(T == string)) return str;
     else return toUTF8(str); 
 }
@@ -18,7 +18,7 @@ string toDString(T)(T str) if (isString!T) {
 /**
     Convert any type of string to a engine usable string
 */
-dstring toEngineString(T)(T str) if (isString!T) {
+dstring kmToEngineString(T)(T str) if (isString!T) {
     static if (is(T == dstring)) return str;
     else return toUTF32(str); 
 }
@@ -26,7 +26,7 @@ dstring toEngineString(T)(T str) if (isString!T) {
 /**
     Convert any type of string to a windows compatible UTF16 string
 */
-wstring toWin32String(T)(T str) if (isString!T) {
+wstring kmToWin32String(T)(T str) if (isString!T) {
     static if (is(T == wstring)) return str;
     else return toUTF16(str);
 }
