@@ -13,6 +13,7 @@ public import engine.render.shader;
 public import engine.render.texture;
 public import engine.render.batcher;
 public import engine.render.fbo;
+public import engine.render.particlesystem;
 
 void initRender() {
 
@@ -30,6 +31,7 @@ void initRender() {
     glDepthFunc(GL_LESS);
 
     GameBatch = new SpriteBatch();
+    initParticleSystem();
 }
 
 private int viewportX;
