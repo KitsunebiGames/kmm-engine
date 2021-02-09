@@ -47,6 +47,8 @@ private GLint vsize;
 private Camera2D baseCamera;
 
 package(engine) void initParticleSystem() {
+
+    // Initialize all the base needs for rendering particles
     glGenVertexArrays(1, &vao);
     particleShader = new Shader(import("shaders/particle.vert"), import("shaders/particle.frag"));
     baseCamera = new Camera2D();
@@ -92,7 +94,6 @@ private:
         // So that we have to sort less when particles die
         alias comparer = (a, b) => cmp(a.lifespan, b.lifespan) > 0;
         sort!comparer(particles[0..MAX_PARTICLES]);
-        //AppLog.info("TEST", "%s", particles[0..100]);
         
         // Recalculate how many alive particles we have
         aliveParticles = 0;
@@ -140,6 +141,8 @@ public:
         this.textureSize = texture.width;
         this.size = textureSize;
 
+        // We pre-generate the VBO and its data
+        // so that we can update smaller sections later
         glBindVertexArray(vao);
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -167,13 +170,25 @@ public:
     */
     void update() {
         foreach(i; 0..aliveParticles) {
+
+            // Lifespan needs to decrease and the 
+            // particle needs to follow its set direction
             particles[i].lifespan -= KM_TIMESTEP;
             particles[i].position += particles[i].direction;
+
+            // User logic
             particleActorFunc(particles[i]);
+
+            // Update the data for the rendering copies.
             particleRenderData[i].position = particles[i].position;
             particleRenderData[i].color = particles[i].color;
             particleRenderData[i].scale = particles[i].scale;
         }
+
+        // We want to clean up any unused particles
+        // and refill the buffer
+        // Otherwise we wouldn't see anything
+        // on the screen
         cleanup();
         updateBuffer();
     }
