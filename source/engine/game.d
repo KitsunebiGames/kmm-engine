@@ -9,11 +9,10 @@ import bindbc.sdl;
 import engine;
 import engine.config;
 
-private double previousTime_;
-private double currentTime_;
-private double deltaTime_;
-
-private double timeAccumulator;
+private double previousTime_ = 0;
+private double currentTime_ = 0;
+private double deltaTime_ = 0;
+private double timeAccumulator = 0;
 
 private Framebuffer framebuffer;
 
@@ -54,6 +53,8 @@ void function() kmCleanup;
 */
 void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
     kmInit();
+    currentTime_ = cast(double)SDL_GetPerformanceCounter()/cast(double)SDL_GetPerformanceFrequency();
+    previousTime_ = currentTime_;
 
     framebuffer = new Framebuffer(GameWindow, viewportSize);
     while(!GameWindow.isExitRequested) {
@@ -64,6 +65,7 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
         currentTime_ = cast(double)SDL_GetPerformanceCounter()/cast(double)SDL_GetPerformanceFrequency();
         deltaTime_ = currentTime_-previousTime_;
         previousTime_ = currentTime_;
+        timeAccumulator += deltaTime_;
         
         // Bind our framebuffer
         framebuffer.bind();
@@ -76,9 +78,8 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
             kmUpdate();
 
             // Fixed timestep updates
-            timeAccumulator += deltaTime();
             float tTimeAcc = 0;
-            while(timeAccumulator > KM_TIMESTEP && tTimeAcc < KM_MAX_TIMESTEP) {
+            while(timeAccumulator >= KM_TIMESTEP && tTimeAcc < KM_MAX_TIMESTEP) {
                 timeAccumulator -= KM_TIMESTEP;
                 tTimeAcc += KM_TIMESTEP;
                 kmFixedUpdate();
@@ -163,4 +164,8 @@ double prevTime() {
 */
 double currTime() {
     return currentTime_;
+}
+
+bool kmIsRunningSlowly() {
+    return timeAccumulator > KM_MAX_TIMESTEP;
 }

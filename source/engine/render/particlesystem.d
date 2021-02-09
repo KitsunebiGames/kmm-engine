@@ -2,11 +2,12 @@ module engine.render.particlesystem;
 import engine;
 import std.algorithm.sorting;
 import std.exception;
+import engine.config;
 
 /**
     Max number of particles
 */
-enum MAX_PARTICLES = 5_000u;
+enum MAX_PARTICLES = 10_000u;
 
 /**
     A singular particle
@@ -23,6 +24,11 @@ struct Particle {
     vec2 direction;
 
     /**
+        Scale of the particle
+    */
+    float scale = 1;
+
+    /**
         The color of the particle
     */
     vec4 color;
@@ -37,6 +43,7 @@ private GLuint vao;
 private Shader particleShader;
 
 private GLint vp;
+private GLint vsize;
 private Camera2D baseCamera;
 
 package(engine) void initParticleSystem() {
@@ -44,6 +51,7 @@ package(engine) void initParticleSystem() {
     particleShader = new Shader(import("shaders/particle.vert"), import("shaders/particle.frag"));
     baseCamera = new Camera2D();
     vp = particleShader.getUniformLocation("vp");
+    vsize = particleShader.getUniformLocation("size");
 }
 
 /**
@@ -54,6 +62,7 @@ private:
     struct RParticle {
         vec2 position;
         vec4 color;
+        float scale;
     }
 
     GLuint vbo;
@@ -81,12 +90,14 @@ private:
 
         // Sort in descending order
         // So that we have to sort less when particles die
-        sort!("a.lifespan > b.lifespan")(particles[0..MAX_PARTICLES]);
+        alias comparer = (a, b) => cmp(a.lifespan, b.lifespan) > 0;
+        sort!comparer(particles[0..MAX_PARTICLES]);
+        //AppLog.info("TEST", "%s", particles[0..100]);
         
         // Recalculate how many alive particles we have
         aliveParticles = 0;
         foreach(i; 0..MAX_PARTICLES) {
-            if (i <= 0) break;
+            if (particles[i].lifespan <= 0 || !isFinite(particles[i].lifespan)) break;
             aliveParticles++;
         }
     }
@@ -113,6 +124,11 @@ public:
     float startLifetime = 1;
 
     /**
+        Size (in pixels) to render at
+    */
+    int size = 0;
+
+    /**
         Constructor
     */
     this(Texture texture, void delegate(ref Particle) particleInitFunc, void delegate(ref Particle) particleActorFunc) {
@@ -122,6 +138,7 @@ public:
 
         enforce(texture.width == texture.height, "Textures are not equally sized on both axies");
         this.textureSize = texture.width;
+        this.size = textureSize;
 
         glBindVertexArray(vao);
         glGenBuffers(1, &vbo);
@@ -132,6 +149,15 @@ public:
             particleRenderData.ptr,
             GL_DYNAMIC_DRAW
         );
+
+        foreach(i; 0..MAX_PARTICLES) particles[i].lifespan = 0;
+    }
+
+    /**
+        Gets how many particles are alive
+    */
+    size_t alive() {
+        return aliveParticles;
     }
 
     /**
@@ -141,31 +167,32 @@ public:
     */
     void update() {
         foreach(i; 0..aliveParticles) {
-            particles[i].lifespan -= 0.016;
+            particles[i].lifespan -= KM_TIMESTEP;
+            particles[i].position += particles[i].direction;
             particleActorFunc(particles[i]);
             particleRenderData[i].position = particles[i].position;
             particleRenderData[i].color = particles[i].color;
+            particleRenderData[i].scale = particles[i].scale;
         }
         cleanup();
-
         updateBuffer();
     }
 
     /**
         Draw the particle system
     */
-    void draw(int size = 0, Shader shader = null, Camera2D camera = null) {
+    void draw(Shader shader = null, Camera2D camera = null) {
         if (aliveParticles == 0) return;
 
         if (shader is null) shader = particleShader;
         if (camera is null) camera = baseCamera;
 
-        if (size <= 0) size = this.textureSize;
-
         // Disable depth testing so that we don't
         // experience weirdness with particles
         // cutting off other textures
         glDisable(GL_DEPTH_TEST);
+        glEnable(GL_POINT_SPRITE);
+        glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
         // Bind buffers and vao
         glBindVertexArray(vao);
@@ -189,22 +216,34 @@ public:
             GL_FLOAT,
             GL_FALSE,
             RParticle.sizeof,
-            cast(void*)(float.sizeof*2)
+            cast(void*)(RParticle.color.offsetof)
+        );
+
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(
+            2,
+            1,
+            GL_FLOAT,
+            GL_FALSE,
+            RParticle.sizeof,
+            cast(void*)(RParticle.scale.offsetof)
         );
 
         // Use shader and bind texture
         shader.use();
         shader.setUniform(vp, camera.matrix);
+        shader.setUniform(vsize, cast(float)size);
 
         texture.bind();
 
         // Draw the particles
-        glPointSize(size);
         glDrawArrays(GL_POINTS, 0, cast(int)aliveParticles);
 
         // Set up for other draw calls after
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
+        glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+        glDisable(GL_POINT_SPRITE);
         glEnable(GL_DEPTH_TEST);
     }
 
@@ -223,6 +262,7 @@ public:
             Particle p;
             p.position = position;
             p.lifespan = startLifetime;
+            p.scale = 1;
 
             particleInitFunc(p);
 
@@ -231,10 +271,12 @@ public:
             // Update particle render info
             particleRenderData[aliveParticles+i].position = p.position;
             particleRenderData[aliveParticles+i].color = p.color;
+            particleRenderData[aliveParticles+i].scale = p.scale;
         }
-        aliveParticles += count;
 
-        this.updateBuffer();
+        aliveParticles++;
+        cleanup();
+        updateBuffer();
     }
 
     /**

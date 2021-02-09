@@ -4,7 +4,7 @@
     
     Authors: Luna Nielsen
 */
-#version 430
+#version 420
 uniform sampler2D tex;
 
 in vec4 exColor;
