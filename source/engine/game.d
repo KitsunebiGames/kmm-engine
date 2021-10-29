@@ -79,10 +79,12 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
 
             // Fixed timestep updates
             float tTimeAcc = 0;
-            while(timeAccumulator >= KM_TIMESTEP && tTimeAcc < KM_MAX_TIMESTEP) {
-                timeAccumulator -= KM_TIMESTEP;
-                tTimeAcc += KM_TIMESTEP;
-                kmFixedUpdate();
+            if (kmFixedUpdate) {
+                while(timeAccumulator >= KM_TIMESTEP && tTimeAcc < KM_MAX_TIMESTEP) {
+                    timeAccumulator -= KM_TIMESTEP;
+                    tTimeAcc += KM_TIMESTEP;
+                    kmFixedUpdate();
+                }
             }
 
         // Unbind our framebuffer

@@ -71,7 +71,7 @@ void initFontSystem() {
 
     // The game's font
     GameFonts["KosugiMaru"] = new Font("Kosugi Maru", cast(ubyte[])import("fonts/KosugiMaru.ttf"), 24);
-    GameFonts["PixelMPlus10"] = new Font("PixelM+ 10", cast(ubyte[])import("fonts/PixelMPlus10.ttf"), 24);
+    GameFonts["PixelMPlus10"] = new Font("PixelM+ 10", cast(ubyte[])import("fonts/PixelMPlus10.ttf"), 10);
 
     kmSwitchFont("PixelMPlus10");
 }
@@ -147,6 +147,7 @@ private:
     Texture fontTexture;
     Glyph[GlyphIndex] glyphs;
     int size;
+    float scale = 1;
     bool hasVertical;
 
     string name;
@@ -311,9 +312,13 @@ public:
         if (size == this.size) return;
 
         // Set the size of the font
-        FT_Set_Pixel_Sizes(fontFace, 0, size);
+        FT_Set_Pixel_Sizes(fontFace, size, 0);
         metrics = vec2(size, fontFace.size.metrics.height >> 6);
         this.size = size;
+    }
+
+    final void setScale(float scale=1) {
+        this.scale = scale;
     }
 
     /**
@@ -330,7 +335,7 @@ public:
         if (idx !in glyphs) enforce(genGlyphFor(glyph), "Could not find glyph for character %s".format(glyph));
         
         // Return the advance of the glyphs
-        return glyphs[idx].advance;
+        return glyphs[idx].advance*scale;
     }
 
     /**
@@ -366,7 +371,7 @@ public:
             if (curLineLen > size.x) size.x = curLineLen;
         }
         size.y = metrics.y*lines;
-        return size;
+        return size*scale;
     }
 
 
@@ -492,13 +497,15 @@ public:
             (position.y - bearing.y)+metrics.y
         );
 
+        pos *= scale;
+
         mat4 transform =
             mat4.translation(-origin.x, -origin.y, 0) *
             mat4.translation(pos.x, pos.y, 0) *
             mat4.translation(origin.x, origin.y, 0) *
             mat4.zrotation(rotation) * 
             mat4.translation(-origin.x, -origin.y, 0) *
-            mat4.scaling(area.z, area.w, 0);
+            mat4.scaling(area.z*scale, area.w*scale, 0);
 
 
         vec4 uvArea = vec4(
