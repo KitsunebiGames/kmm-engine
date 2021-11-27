@@ -1,7 +1,5 @@
 # Kitsunemimi Engine
-Modified Kitsune Mahjong engine, based on changes from a fork.
-
-This will be the engine where work on Kitsunemimi happens.
+A game engine optimized for making metroidvania games.
 
 ## Dependencies
 The Kitsunemimi engine requires the following dependencies to be present to work:
