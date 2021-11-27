@@ -130,7 +130,7 @@ public:
     void fullscreen(bool value) {
         if (this.fullscreen_ == value) return;
 
-        SDL_SetWindowFullscreen(window, value ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+        SDL_SetWindowFullscreen(window, value ? SDL_WINDOW_FULLSCREEN_DESKTOP : cast(SDL_WindowFlags)0);
         this.fullscreen_ = value;
     }
 
@@ -184,10 +184,17 @@ public:
     }
 
     /**
-        Gets the glfw window pointer
+        Gets the SDL window pointer
     */
     SDL_Window* winPtr() {
         return window;
+    }
+
+    /**
+        Gets the OpenGL context pointer
+    */
+    SDL_GLContext glPtr() {
+        return SDL_GL_GetCurrentContext();
     }
 }
 
