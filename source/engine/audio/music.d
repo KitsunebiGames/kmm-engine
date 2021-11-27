@@ -125,7 +125,7 @@ private:
         }
 
         // Cleanup
-        stream.seek(0);
+        stream.rewind();
         running = false;
         alDeleteBuffers(2, buffers.ptr);
 
