@@ -31,7 +31,7 @@ void kmStopAllMusic() {
 */
 class Music {
 private:
-    enum MUSIC_BUFF_SIZE = 4096;
+    enum MUSIC_BUFF_SIZE = 4096*4;
     enum MUSIC_BUFF_COUNT = 4;
 
     long lastReadLength;
@@ -48,7 +48,7 @@ private:
 
         // The processing buffer
         ALuint pBuf;
-        ubyte[] pBufData = new ubyte[MUSIC_BUFF_SIZE*MUSIC_BUFF_COUNT];
+        float[] pBufData = new float[MUSIC_BUFF_SIZE];
         ALint state;
         
         // The buffer chain
@@ -58,7 +58,7 @@ private:
         // Fill buffers with initial data
         foreach(i; 0..MUSIC_BUFF_COUNT) {
             lastReadLength = stream.readSamples(pBufData);
-            alBufferData(buffers[i], stream.format, pBufData.ptr, cast(int)lastReadLength, cast(int)stream.bitrate);
+            alBufferData(buffers[i], stream.format, pBufData.ptr, cast(int)(lastReadLength*float.sizeof), stream.samplerate);
             alSourceQueueBuffers(sourceId, 1, &buffers[i]);
         }
 
@@ -78,9 +78,9 @@ private:
                 // Read samples to buffer
                 lastReadLength = stream.readSamples(pBufData);
 
-                if (lastReadLength == 0) {
+                if (lastReadLength <= 0) {
                     // If we're at the end and we should loop then loop. (if possible)
-                    if (looping && stream.canSeek) {
+                    if (looping) {
 
                         // Seek back to start of stream and read samples
                         stream.seek(0);
@@ -94,7 +94,7 @@ private:
                 }
 
                 // Buffer the data to OpenAL
-                alBufferData(pBuf, stream.format, pBufData.ptr, cast(int)lastReadLength, cast(int)stream.bitrate);
+                alBufferData(pBuf, stream.format, pBufData.ptr, cast(int)(lastReadLength*float.sizeof), stream.samplerate);
 
                 // Re-queue buffer
                 alSourceQueueBuffers(sourceId, 1, &pBuf);
@@ -142,7 +142,14 @@ public:
         Construct a sound from a file path
     */
     this(string file, string channel = null) {
-        this(open(file), channel);
+        this(new AudioStream(file), channel);
+    }
+
+    /**
+        Construct a sound from a file path
+    */
+    this(ubyte[] data, string channel = null) {
+        this(new AudioStream(data), channel);
     }
 
     /**
@@ -240,9 +247,9 @@ public:
     }
 
     /**
-        Get info about the music
+        File format of the audio stream used
     */
-    AudioInfo getInfo() {
-        return stream.getInfo();
+    string fileFormat() {
+        return stream.fileFormat;
     }
 }

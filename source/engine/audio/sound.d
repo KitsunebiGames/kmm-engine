@@ -15,6 +15,10 @@ import engine.math;
 */
 class Sound {
 private:
+    float[] buffer;
+    string fFormat;
+    int channels;
+
     ALuint bufferId;
     ALuint sourceId;
 
@@ -30,7 +34,14 @@ public:
         Construct a sound from a file path
     */
     this(string file, string channel=null) {
-        this(open(file), channel);
+        this(new AudioStream(file), channel);
+    }
+
+    /**
+        Construct a sound from a file path
+    */
+    this(ubyte[] data, string channel=null) {
+        this(new AudioStream(data), channel);
     }
 
     /**
@@ -40,8 +51,12 @@ public:
 
         // Generate buffer
         alGenBuffers(1, &bufferId);
-        ubyte[] data = stream.readAll();
-        alBufferData(bufferId, stream.format, data.ptr, cast(int)data.length, cast(int)stream.bitrate/stream.channels);
+        buffer = stream.readAllSamples();
+        alBufferData(bufferId, stream.format, buffer.ptr, cast(int)buffer.length*4, stream.samplerate);
+
+        // Set info
+        fFormat = stream.fileFormat;
+        channels = stream.channels;
 
         // Generate source
         alGenSources(1, &sourceId);
@@ -88,5 +103,12 @@ public:
     */
     void stop() {
         alSourceStop(sourceId);
+    }
+
+    /**
+        Returns the file format of the audio source
+    */
+    string fileFormat() {
+        return fFormat;
     }
 }
