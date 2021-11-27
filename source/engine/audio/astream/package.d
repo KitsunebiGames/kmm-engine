@@ -19,6 +19,10 @@ private:
     // Backend stream
     af.AudioStream* bStream;
 
+    bool fromFile;
+    string file;
+    ubyte[] data;
+
 public:
     /**
         Reads all samples for a file
@@ -39,6 +43,8 @@ public:
     */
     this(ubyte[] memory) {
         bStream = new af.AudioStream;
+        this.data = memory;
+        this.fromFile = false;
         bStream.openFromMemory(memory);
     }
 
@@ -47,6 +53,8 @@ public:
     */
     this(string file) {
         bStream = new af.AudioStream;
+        this.file = file;
+        this.fromFile = true;
         bStream.openFromFile(file);
     }
 
@@ -82,6 +90,20 @@ public:
         bStream.seekPosition(cast(int)location/channels);
     }
 
+    bool canSeek() {
+        final switch(bStream.getFormat()) with (af.AudioFileFormat)
+        {
+            case wav:     return true;
+            case mp3:     return true;
+            case flac:    return true;
+            case ogg:     return false;
+            case opus:    return true;
+            case mod:     return false;
+            case xm:      return false;
+            case unknown: return false;
+        }
+    }
+
     /**
         Get the position in the stream
     */
@@ -105,4 +127,20 @@ public:
         Gets the sample rate of the stream
     */
     int samplerate() { return cast(int)bStream.getSamplerate(); }
+
+    /**
+        Rewinds the audio stream
+    */
+    void rewind() {
+        if (canSeek) {
+            seek(0);
+        } else {
+            import dplug.core : destroyFree;
+            destroyFree(bStream);
+
+            bStream = new af.AudioStream;
+            if (fromFile) bStream.openFromFile(file);
+            else bStream.openFromMemory(data);
+        }
+    }
 }

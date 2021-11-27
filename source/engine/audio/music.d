@@ -83,7 +83,7 @@ private:
                     if (looping) {
 
                         // Seek back to start of stream and read samples
-                        stream.seek(0);
+                        stream.rewind();
                         lastReadLength = stream.readSamples(pBufData);
 
                         debug AppLog.info("Music Debug", "Music %s looped...", sourceId);
