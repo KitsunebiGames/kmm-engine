@@ -74,7 +74,7 @@ public:
         Returns 0 if there's no more samples
     */
     ptrdiff_t readSamples(ref float[] toArray) {
-        return readSamples(toArray.ptr, toArray.length);
+        return readSamples(toArray.ptr, cast(int)toArray.length);
     }
 
     /**
