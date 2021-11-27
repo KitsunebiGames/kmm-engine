@@ -1,15 +1,26 @@
 module app;
 import engine;
-import game;
+import rt = runtime;
+import ed = editor;
 
-int main() {
+int main(string[] args) {
 
     // Set the function pointers
-    kmInit = &_init;
-    kmUpdate = &_update;
-    kmCleanup = &_cleanup;
-    kmBorder = &_border;
-    kmPostUpdate = &_postUpdate;
+    kmInit = &rt._init;
+    kmUpdate = &rt._update;
+    kmCleanup = &rt._cleanup;
+    kmBorder = &rt._border;
+    kmPostUpdate = &rt._postUpdate;
+
+    if (args.length > 1) {
+        if (args[1] == "--editor") {
+            kmInit = &ed._init;
+            kmUpdate = &ed._update;
+            kmCleanup = &ed._cleanup;
+            kmBorder = &ed._border;
+            kmPostUpdate = &ed._postUpdate;
+        }
+    }
 
     // Init engine start the game and then close the engine once the game quits
     initEngine();
