@@ -19,6 +19,10 @@ private:
     // Backend stream
     af.AudioStream* bStream;
 
+    // position of the stream
+    size_t position;
+
+    // For rewind reuse
     bool fromFile;
     string file;
     ubyte[] data;
@@ -70,7 +74,7 @@ public:
         Returns 0 if there's no more samples
     */
     ptrdiff_t readSamples(ref float[] toArray) {
-        return cast(int)bStream.readSamplesFloat(toArray.ptr, cast(int)(toArray.length/channels))*channels;
+        return readSamples(toArray.ptr, toArray.length);
     }
 
     /**
@@ -80,14 +84,19 @@ public:
         Returns 0 if there's no more samples
     */
     ptrdiff_t readSamples(float* toArray, int samples) {
-        return bStream.readSamplesFloat(toArray, cast(int)(samples/channels))*channels;
+        int length = bStream.readSamplesFloat(toArray, cast(int)(samples/channels))*channels;
+        position += length;
+        return length;
     }
 
     /**
         Seek to a PCM location in the stream
     */
     void seek(size_t location) {
-        bStream.seekPosition(cast(int)location/channels);
+        if (canSeek()) {
+            position = location;
+            bStream.seekPosition(cast(int)location/channels);
+        }
     }
 
     bool canSeek() {
@@ -105,9 +114,9 @@ public:
     }
 
     /**
-        Get the position in the stream
+        Get the sample position in the stream
     */
-    size_t tell() { return 0; }
+    size_t tell() { return position; }
 
     /**
         Gets the OpenAL format of the audio stream
@@ -137,6 +146,8 @@ public:
         } else {
             import dplug.core : destroyFree;
             destroyFree(bStream);
+
+            position = 0;
 
             bStream = new af.AudioStream;
             if (fromFile) bStream.openFromFile(file);
