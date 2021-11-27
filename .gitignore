@@ -31,3 +31,6 @@ libs/as_c.lib
 
 # Some linux thing that shouldn't be there.
 .fuse*
+
+# This file is auto-generated
+source/engine/ver.d
