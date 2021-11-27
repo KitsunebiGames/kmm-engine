@@ -28,3 +28,6 @@ game/
 # LDC2 support should not be here since it is inefficient for DMD compilation
 libs/angelscript.lib
 libs/as_c.lib
+
+# Some linux thing that shouldn't be there.
+.fuse*
