@@ -54,6 +54,16 @@ Font[string] GameFonts;
 Font GameFont;
 
 /**
+    Data of Kosugi Maru
+*/
+ubyte[] KOSUGI_MARU = cast(ubyte[])import("fonts/KosugiMaru.ttf");
+
+/**
+    Data of Pixel MPlus 10
+*/
+ubyte[] PIXEL_M_PLUS_10 = cast(ubyte[])import("fonts/PixelMPlus10.ttf");
+
+/**
     Initialize the font subsystem
 */
 void initFontSystem() {
@@ -70,8 +80,8 @@ void initFontSystem() {
     vp = fontShader.getUniformLocation("vp");
 
     // The game's font
-    GameFonts["KosugiMaru"] = new Font("Kosugi Maru", cast(ubyte[])import("fonts/KosugiMaru.ttf"), 24);
-    GameFonts["PixelMPlus10"] = new Font("PixelM+ 10", cast(ubyte[])import("fonts/PixelMPlus10.ttf"), 10);
+    GameFonts["KosugiMaru"] = new Font("Kosugi Maru", KOSUGI_MARU, 24);
+    GameFonts["PixelMPlus10"] = new Font("PixelM+ 10", PIXEL_M_PLUS_10, 10);
 
     kmSwitchFont("PixelMPlus10");
 }
