@@ -1,4 +1,5 @@
 module editor;
+import engine;
 
 /**
     Initialize game
