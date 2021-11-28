@@ -15,6 +15,7 @@ public import engine.ui;
 public import engine.game;
 public import engine.i18n;
 public import engine.scripting;
+public import engine.gct;
 
 import bindbc.sdl;
 import bindbc.openal;
