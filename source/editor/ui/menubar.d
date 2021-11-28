@@ -1,5 +1,7 @@
 module editor.ui.menubar;
+import engine.ver;
 import bindbc.imgui;
+import std.format;
 
 void kmEditorUIMenuBar() {
     if (igBeginMainMenuBar()) {
@@ -17,6 +19,17 @@ void kmEditorUIMenuBar() {
         }
 
         if (igBeginMenu("Help", true)) {
+
+            if (igMenuItem("Documentation")) {
+                
+            }
+
+            if (igMenuItem("About")) {
+
+            }
+
+            igSeparator();
+            igText("v. %s", KM_VERSION.ptr);
             
             igEndMenu();
         }
