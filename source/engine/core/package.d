@@ -9,9 +9,9 @@
 module engine.core;
 public import engine.core.log;
 public import engine.core.window;
-public import engine.core.astack;
 public import engine.core.strings;
 public import engine.core.state;
+public import engine.core.err : FatalException;
 
 /**
     Forcibly "casts" one type to an other
