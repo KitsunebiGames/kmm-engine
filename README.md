@@ -4,6 +4,7 @@ A game engine optimized for making metroidvania games.
 ## Dependencies
 The Kitsunemimi engine requires the following dependencies to be present to work:
  * OpenAL Driver ([OpenAL-Soft included on Windows](https://github.com/kcat/openal-soft))
+   * Driver REQUIRES support for the FLOAT32 OAL extension and audio files may only be mono or stereo.
  * OpenGL Driver
  * SDL2 2.0.12 or above
  * FreeType
