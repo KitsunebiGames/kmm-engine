@@ -12,25 +12,18 @@ void _init() {
     GameWindow.setSwapInterval(SwapInterval.VSync);
     GameWindow.title = "Kitsunemimi Runtime (No Game Loaded)";
 
+    kmScriptStoreSet("GameObjectTest", KMScript("function helloWorld() end"));
 
     auto state = kmLuaNewState();
-    kmLuaLoad(state, "function test() end");
-    kmLuaSetEntityEnv(state, "_ENTITIES", "TestEntity", null);
-    kmLuaLoadApply(state);
-
-    kmLuaLoad(state, "function test() end");
-    kmLuaSetEntityEnv(state, "_ENTITIES", "TestEntity2", null);
-    kmLuaLoadApply(state);
-
-    kmLuaLoad(state, "function test() end function test2() end");
-    kmLuaSetEntityEnv(state, "_ENTITIES", "TestEntity3", null);
-    kmLuaLoadApply(state);
+    KMGameObject newGameObject;
+    newGameObject.id = 0x0F384ABFF;
+    newGameObject.script = "GameObjectTest";
+    newGameObject.registerGameObject(state);
     
-    AppLog.info("LUA", "%s", kmLuaDumpGlobalTable(state, "_ENTITIES"));
+    AppLog.info("LUA", "%s", kmLuaDumpGlobalTable(state, "_GAMEOBJECTS"));
 
-    kmLuaDestroyEntityEnv(state, "_ENTITIES", "TestEntity");
-    kmLuaDestroyEntityEnv(state, "_ENTITIES", "TestEntity3");
-    AppLog.info("LUA", "%s", kmLuaDumpGlobalTable(state, "_ENTITIES"));
+    newGameObject.destroyGameObject(state);
+    AppLog.info("LUA", "%s", kmLuaDumpGlobalTable(state, "_GAMEOBJECTS"));
 
     // No way to load game content yet
     throw new Exception(NOT_FOUND_MSG);
