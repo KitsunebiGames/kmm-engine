@@ -60,14 +60,16 @@ void _kmLuaDumpTablesRecurse(lua_State* state, ref JSONValue value) {
                 break;
 
             case LUA_TNUMBER:
-                key = lua_tonumber(state, -2).to!string;
+                if (lua_isinteger(state, -2)) key = lua_tointeger(state, -2).to!string;
+                else key = lua_tonumber(state, -2).to!string;
                 break;
             default: return; // skip keys we can't parse
         }
 
         switch(lua_type(state, -1)) {
             case LUA_TNUMBER:
-                value[key] = lua_tonumber(state, -1);
+                if (lua_isinteger(state, -1)) value[key] = lua_tointeger(state, -1);
+                else value[key] = lua_tonumber(state, -1);
                 break;
             case LUA_TSTRING:
                 value[key] = lua_tostring(state, -1).fromStringz;
