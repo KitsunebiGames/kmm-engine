@@ -54,7 +54,7 @@ void kmPakInit() {
     Get how many packages that were loaded
 */
 int kmPakGetCount() {
-    return loadedFiles.length;
+    return cast(int)loadedFiles.length;
 }
 
 /**

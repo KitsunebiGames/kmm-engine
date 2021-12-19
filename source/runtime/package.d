@@ -13,13 +13,20 @@ void _init(string[] args) {
     GameWindow.setSwapInterval(SwapInterval.VSync);
     GameWindow.title = "Kitsunemimi Runtime (No Game Loaded)";
 
-    music = new Music(args[0]);
-    music.setLooping(true);
-    music.play();
 
-    // No way to load game content yet
-    AppLog.error("Runtime", "No game content found.");
-    throw new Exception(NOT_FOUND_MSG);
+
+    if (kmPakGetCount() <= 0) {
+        if (args.length > 0) {
+            music = new Music(args[0]);
+            music.setLooping(true);
+            music.play();
+        }
+
+        // No game content found to load.
+        AppLog.error("Runtime", "No game content found.");
+        throw new Exception(NOT_FOUND_MSG);
+    }
+
 }
 
 /**
