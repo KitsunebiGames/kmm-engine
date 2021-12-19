@@ -17,7 +17,7 @@ import std.file;
 import std.path;
 
 private {
-    PakFile[] loadedFiles;
+    PakFile*[] loadedFiles;
     int failedLoads;
 }
 
@@ -40,7 +40,7 @@ void kmPakInit() {
 
         try {
             // Add file to entries
-            loadedFiles ~= PakFile(entry.name());
+            loadedFiles ~= new PakFile(entry.name());
         } catch (Exception ex) {
             AppLog.warn("Engine", "Failed to load content package '%s', reason: %s".format(entry.name(), ex.msg));
             failedLoads++;
@@ -79,7 +79,7 @@ bool kmPakCanFind(string path) {
 */
 ubyte[] kmPakGetResource(string path) {
     ptrdiff_t element = -1;
-    ubyte highestPriority = 0;
+    int highestPriority = -1;
 
     // Seek for the highest priority element with the specified path
     // This allows PAK files to overwrite each other, allowing for DLC

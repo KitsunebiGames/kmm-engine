@@ -58,7 +58,7 @@ void kmPakWriteToFile(PakEntryBinding[] bindings, string file) {
 
         // Set the offset
         writer.seek(boff);
-        writer.rawWrite(nativeToLittleEndian!uint(cast(uint)writer.tell()));
+        writer.rawWrite(nativeToLittleEndian!uint(cast(uint)writeStart));
         writer.seek(writeStart);
 
         // write the contents
