@@ -13,9 +13,11 @@ you could use this engine to make games within without having to write the engin
 ### Caveats
  * No builtin DRM, I despise it.
  * No asset encryption, though assets are bundled in to packages.
- * No currently existing support for games consoles.
- * Single-threaded, except for audio playback. (At least until potential bgfx renderer rewrite)
+ * No currently existing support for games consoles.*
+ * Single-threaded, except for audio playback.* 
  * Still under semi-active development.
+
+\* (At least until potential bgfx renderer rewrite)
 
 &nbsp;  
 &nbsp;  
