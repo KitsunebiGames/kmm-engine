@@ -42,7 +42,7 @@ void kmPakInit() {
             // Add file to entries
             loadedFiles ~= PakFile(entry.name());
         } catch (Exception ex) {
-            AppLog.warn("Engine", "Failed to load content package '%s'".format(entry.name()));
+            AppLog.warn("Engine", "Failed to load content package '%s', reason: %s".format(entry.name(), ex.msg));
             failedLoads++;
         }
     }

@@ -12,7 +12,7 @@ import std.bitmanip;
 import std.traits;
 
 /// Kitsunemimi Package Type 0
-enum PAK_MAGIC = "FOXPAK0";
+enum PAK_MAGIC = "FOXPAK_0";
 
 /**
     An entry in the PAK table
@@ -45,7 +45,7 @@ private:
     PakEntry[string] entries;
 
     bool checkMagic() {
-        ubyte[8] magic;
+        ubyte[PAK_MAGIC.length] magic;
         io.rawRead(magic);
         return magic == cast(ubyte[])PAK_MAGIC;
     }

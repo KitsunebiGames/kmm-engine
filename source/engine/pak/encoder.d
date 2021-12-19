@@ -15,7 +15,8 @@ import std.bitmanip;
     A binding from a Pak entry to a physical file.
 */
 struct PakEntryBinding {
-    PakEntry entry;
+    ubyte priority;
+    string virtualPath;
     string file;
 }
 
@@ -37,36 +38,37 @@ void kmPakWriteToFile(PakEntryBinding[] bindings, string file) {
         auto entry = DirEntry(binding.file);
 
         // Write priority
-        writer.rawWrite([binding.entry.priority]);
+        writer.rawWrite([binding.priority]);
 
-        // Updat binding list
+        // Update binding list
         offsetBindings[writer.tell()] = binding;
 
-        // numeric stuff
-        writer.rawWrite([
-            nativeToLittleEndian!uint(cast(uint)0u), // placeholder for data offset
-            nativeToLittleEndian!uint(cast(uint)entry.size()), // data length
-            nativeToLittleEndian!uint(cast(uint)binding.entry.path.length) // length of path name
-        ]);
+        writer.rawWrite(nativeToLittleEndian!uint(cast(uint)0u)); // placeholder for data offset
+        writer.rawWrite(nativeToLittleEndian!uint(cast(uint)entry.size())); // data length
+        writer.rawWrite(nativeToLittleEndian!uint(cast(uint)binding.virtualPath.length)); // length of path name
 
         // Write path
-        writer.rawWrite(cast(ubyte[])binding.entry.path);
+        writer.rawWrite(cast(ubyte[])binding.virtualPath);
     }
+
+    size_t writeStart = writer.tell();
 
     foreach(boff, binding; offsetBindings) {
         reader = File(binding.file, "rb");
 
         // Set the offset
         writer.seek(boff);
-        writer.rawWrite([nativeToLittleEndian!uint(cast(uint)writer.tell())]);
+        writer.rawWrite(nativeToLittleEndian!uint(cast(uint)writer.tell()));
+        writer.seek(writeStart);
 
         // write the contents
-        ubyte[] fileData = new ubyte[binding.entry.length];
+        ubyte[] fileData = new ubyte[reader.size()];
         reader.rawRead(fileData);
         writer.rawWrite(fileData);
 
         // We're done reading the contents in this iteration
         reader.close();
+        writeStart = writer.tell();
     }
 
     // We're done.
