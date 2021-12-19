@@ -10,7 +10,7 @@ public import engine.scripting.reg;
 public import engine.scripting.script;
 
 package(engine) {
-    void initScripting() {
-        loadLua();
+    LuaSupport initScripting() {
+        return loadLua();
     }
 }

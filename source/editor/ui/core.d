@@ -39,6 +39,7 @@ void kmEditorUIInit() {
     io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;           // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags.ViewportsEnable;         // Enable Viewports (causes freezes)
     io.ConfigWindowsResizeFromEdges = true;                     // Enable Edge resizing
+    io.IniFilename = null;
 
     // Init stuff
     ImGui_ImplSDL2_InitForOpenGL(GameWindow.winPtr(), GameWindow.glPtr());
@@ -52,9 +53,6 @@ void kmEditorUIBegin() {
     ImGuiOpenGLBackend.new_frame();
     ImGui_ImplSDL2_NewFrame();
     igNewFrame();
-
-    // Add docking space
-    //ImGuiID viewportDock = igDockSpaceOverViewport(null, cast(ImGuiDockNodeFlags)0, null);
 }
 
 void kmEditorUIEnd() {

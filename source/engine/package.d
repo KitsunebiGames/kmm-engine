@@ -20,6 +20,7 @@ public import engine.gct;
 import bindbc.sdl;
 import bindbc.openal;
 import bindbc.freetype;
+import std.exception;
 
 /**
     Initialize the game engine
@@ -63,7 +64,11 @@ void initEngine() {
 
     // Initialize subsystems
     AppLog.info("Engine", "Intialized internal state for renderer...");
-    initScripting();
+    LuaSupport support = initScripting();
+    enforce(support != LuaSupport.noLibrary, "Failed to initialize scripting engine, Lua not found.");
+    enforce(support != LuaSupport.badLibrary, "Failed to initialize scripting engine, incompatible Lua version.");
+    initGCT();
+    AppLog.info("Engine", "Scripting engine initialized...");
 }
 
 /**

@@ -4,28 +4,21 @@ import engine.ver;
 import std.format;
 
 enum NOT_FOUND_MSG = "Game content not found!\nMake sure the runtime executable is in the game directory, or\nrun with the --editor flag to enter the game editor.";
+Music music;
 
 /**
     Initialize game
 */
-void _init() {
+void _init(string[] args) {
     GameWindow.setSwapInterval(SwapInterval.VSync);
     GameWindow.title = "Kitsunemimi Runtime (No Game Loaded)";
 
-    kmScriptStoreSet("GameObjectTest", KMScript("function helloWorld() end"));
-
-    auto state = kmLuaNewState();
-    KMGameObject newGameObject;
-    newGameObject.id = 0x0F384ABFF;
-    newGameObject.script = "GameObjectTest";
-    newGameObject.registerGameObject(state);
-    
-    AppLog.info("LUA", "%s", kmLuaDumpGlobalTable(state, "_GAMEOBJECTS"));
-
-    newGameObject.destroyGameObject(state);
-    AppLog.info("LUA", "%s", kmLuaDumpGlobalTable(state, "_GAMEOBJECTS"));
+    music = new Music(args[0]);
+    music.setLooping(true);
+    music.play();
 
     // No way to load game content yet
+    AppLog.error("Runtime", "No game content found.");
     throw new Exception(NOT_FOUND_MSG);
 }
 

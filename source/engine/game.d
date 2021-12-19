@@ -19,7 +19,7 @@ private Framebuffer framebuffer;
 /**
     Function run when the game is to initialize
 */
-void function() kmInit;
+void function(string[]) kmInit;
 
 /**
     Function run when the game is to update
@@ -51,10 +51,10 @@ void function() kmCleanup;
 
     viewportSize sets the desired viewport size for the framebuffer, defaults to 1080p (1920x1080)
 */
-void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
+void startGame(string[] args, vec2i viewportSize = vec2i(1920, 1080)) {
     
     try {
-        kmInit();
+        kmInit(args);
         currentTime_ = cast(double)SDL_GetPerformanceCounter()/cast(double)SDL_GetPerformanceFrequency();
         previousTime_ = currentTime_;
 

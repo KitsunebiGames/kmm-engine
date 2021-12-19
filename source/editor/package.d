@@ -6,7 +6,7 @@ import editor.ui;
 /**
     Initialize game
 */
-void _init() {
+void _init(string[] args) {
     GameWindow.setSwapInterval(SwapInterval.VSync);
     GameWindow.title = "Kitsunemimi Editor";
 
@@ -17,7 +17,9 @@ void _init() {
     Update game
 */
 void _update() {
-    GameFont.draw!true("Hello, world!", vec2(8, 8));
+    kmSetViewport(vec2i(GameWindow.width(), GameWindow.height()));
+    GameFont.setScale(2);
+    GameFont.draw!true("Hello, world!", vec2(16, 16));
     GameFont.flush();
 }
 
@@ -39,9 +41,5 @@ void _border() {
     Post-update
 */
 void _postUpdate() {
-    kmEditorUIBegin();
-    
-        kmEditorUIMenuBar();
-
-    kmEditorUIEnd();
+    kmEditorDrawUI();
 }

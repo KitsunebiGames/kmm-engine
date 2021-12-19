@@ -31,3 +31,6 @@ libs/as_c.lib
 
 # This file is auto-generated
 source/engine/ver.d
+
+# No thanks, imgui
+imgui.ini
