@@ -25,7 +25,7 @@ private {
     Initializes package loader
 */
 void kmPakInit() {
-    
+
     // Make sure kmpack folder exists
     if (!exists("kmpack")) mkdir("kmpack");
 
@@ -46,6 +46,15 @@ void kmPakInit() {
             failedLoads++;
         }
     }
+
+    AppLog.info("Engine", "Loaded %s content packages...", loadedFiles.length);
+}
+
+/**
+    Get how many packages that were loaded
+*/
+int kmPakGetCount() {
+    return loadedFiles.length;
 }
 
 /**
