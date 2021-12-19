@@ -10,6 +10,8 @@ import std.file;
 import std.stdio;
 import std.path;
 import std.bitmanip;
+import std.exception;
+import std.format;
 
 /**
     A binding from a Pak entry to a physical file.
@@ -36,6 +38,9 @@ void kmPakWriteToFile(PakEntryBinding[] bindings, string file) {
 
     foreach(binding; bindings) {
         auto entry = DirEntry(binding.file);
+
+        // Enforce a sensible pathing scheme
+        enforce(isValidPath(binding.virtualPath), "'%s' is not a valid virtual path".format(binding.virtualPath));
 
         // Write priority
         writer.rawWrite([binding.priority]);
