@@ -16,6 +16,7 @@ public import engine.game;
 public import engine.i18n;
 public import engine.scripting;
 public import engine.gct;
+public import engine.pak;
 
 import bindbc.sdl;
 import bindbc.openal;
@@ -69,6 +70,10 @@ void initEngine() {
     enforce(support != LuaSupport.badLibrary, "Failed to initialize scripting engine, incompatible Lua version.");
     initGCT();
     AppLog.info("Engine", "Scripting engine initialized...");
+
+    // Initialize pak reader
+    kmPakInit();
+    AppLog.info("Engine", "Content managment initialized...");
 }
 
 /**
