@@ -31,7 +31,7 @@ void kmPakWriteToFile(PakEntryBinding[] bindings, string file) {
     writer.rawWrite(PAK_MAGIC);
 
     // Write entry table count
-    writer.rawWrite(nativeToLittleEndian!uint(bindings.length));
+    writer.rawWrite(nativeToLittleEndian!uint(cast(uint)bindings.length));
 
     foreach(binding; bindings) {
         auto entry = DirEntry(binding.file);
@@ -44,9 +44,9 @@ void kmPakWriteToFile(PakEntryBinding[] bindings, string file) {
 
         // numeric stuff
         writer.rawWrite([
-            nativeToLittleEndian!uint(0u), // placeholder for data offset
-            nativeToLittleEndian!uint(entry.size()), // data length
-            nativeToLittleEndian!uint(binding.entry.path.length) // length of path name
+            nativeToLittleEndian!uint(cast(uint)0u), // placeholder for data offset
+            nativeToLittleEndian!uint(cast(uint)entry.size()), // data length
+            nativeToLittleEndian!uint(cast(uint)binding.entry.path.length) // length of path name
         ]);
 
         // Write path
@@ -58,7 +58,7 @@ void kmPakWriteToFile(PakEntryBinding[] bindings, string file) {
 
         // Set the offset
         writer.seek(boff);
-        writer.rawWrite([nativeToLittleEndian!uint(writer.tell())]);
+        writer.rawWrite([nativeToLittleEndian!uint(cast(uint)writer.tell())]);
 
         // write the contents
         ubyte[] fileData = new ubyte[binding.entry.length];

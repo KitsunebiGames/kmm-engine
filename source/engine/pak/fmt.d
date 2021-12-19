@@ -51,8 +51,8 @@ private:
     }
 
     void readEntries() {
-        uint entries = readInt!uint;
-        foreach(i; 0..entries) {
+        uint entriesToRead = readInt!uint;
+        foreach(i; 0..entriesToRead) {
             PakEntry entry;
             entry.priority = readInt!ubyte;
             entry.offset = readInt!uint;

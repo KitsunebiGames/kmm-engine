@@ -25,8 +25,12 @@ private {
     Initializes package loader
 */
 void kmPakInit() {
-    string path = buildPath("kmpack", "*.pak");
-    foreach(DirEntry entry; dirEntries(path, SpanMode.breadth, false)) {
+    
+    // Make sure kmpack folder exists
+    if (!exists("kmpack")) mkdir("kmpack");
+
+    // Iterate over entries
+    foreach(DirEntry entry; dirEntries("kmpack", "*.pak", SpanMode.breadth, false)) {
         
         // Skip directories and symbolic links,
         // they're technically both files, but not PAK files.
@@ -71,7 +75,7 @@ ubyte[] kmPakGetResource(string path) {
     }
 
     // Make sure element exists
-    enforce(i >= 0, "No resource found at path '%s'".format(path));
+    enforce(element >= 0, "No resource found at path '%s'".format(path));
 
     // Return resource
     return loadedFiles[element].getResource(path);
