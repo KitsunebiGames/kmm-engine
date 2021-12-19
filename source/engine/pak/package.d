@@ -65,6 +65,16 @@ int kmPakGetFailed() {
 }
 
 /**
+    Gets whether a resource can be found in the loaded packages
+*/
+bool kmPakCanFind(string path) {
+    foreach(pakFile; loadedFiles) {
+        if (pakFile.hasResource(path)) return true;
+    }
+    return false;
+}
+
+/**
     Gets a resource for the specified path
 */
 ubyte[] kmPakGetResource(string path) {
