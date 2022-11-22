@@ -10,14 +10,9 @@ module engine.math;
 public import engine.math.camera;
 public import engine.math.transform;
 public import engine.math.obb;
-public import engine.math.rect;
 public import std.math;
-public import gl3n.math;
-public import gl3n.linalg;
-public import gl3n.aabb;
-public import gl3n.interpolate;
+public import inmath;
 import engine.core.log;
-import gl3n.util : is_vector;
 
 /**
     Smoothly dampens from a position to a target

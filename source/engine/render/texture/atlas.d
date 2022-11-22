@@ -6,7 +6,7 @@
 */
 module engine.render.texture.atlas;
 import engine.render.texture;
-import gl3n.linalg;
+import inmath;
 import std.exception;
 import std.format;
 import engine;

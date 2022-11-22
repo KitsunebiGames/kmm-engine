@@ -5,7 +5,7 @@
     Authors: Luna Nielsen
 */
 module engine.math.obb;
-import gl3n.linalg;
+import inmath;
 
 /**
     Oriented bounding box
@@ -31,20 +31,20 @@ public:
         Minimum extent of the OBB
     */
     vec3 min() {
-        return vec3(rotation.to_matrix!(3, 3) * vec3(position.x-size.x, position.y-size.y, position.z-size.z));
+        return vec3(rotation.toMatrix!(3, 3) * vec3(position.x-size.x, position.y-size.y, position.z-size.z));
     }
 
     /**
         Maximum extent of the OBB
     */
     vec3 max() {
-        return vec3(rotation.to_matrix!(3, 3) * vec3(position.x+size.x, position.y+size.y, position.z+size.z));
+        return vec3(rotation.toMatrix!(3, 3) * vec3(position.x+size.x, position.y+size.y, position.z+size.z));
     }
 
     /**
         Gets this OBB as a matrix
     */
     mat3 asMatrix() {
-        return mat3.scaling(size.x, size.y, size.z) * rotation.to_matrix!(3, 3) * mat3.translation(position);
+        return mat3.scaling(size.x, size.y, size.z) * rotation.toMatrix!(3, 3) * mat3.translation(position);
     }
 }

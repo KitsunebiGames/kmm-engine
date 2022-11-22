@@ -5,8 +5,7 @@
     Authors: Luna Nielsen
 */
 module engine.render.texture.packer;
-import gl3n.linalg;
-import gl3n.math;
+import inmath;
 import std.exception;
 import engine.core.log;
 import std.format;

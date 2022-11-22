@@ -141,7 +141,7 @@ public:
             mat4.translation(-origin.x, -origin.y, 0) *
             mat4.translation(position.x, position.y, 0) *
             mat4.translation(origin.x, origin.y, 0) *
-            mat4.zrotation(rotation) * 
+            mat4.zRotation(rotation) * 
             mat4.translation(-origin.x, -origin.y, 0) *
             mat4.scaling(position.z, position.w, 0);
 
@@ -194,7 +194,7 @@ public:
             mat4.translation(-origin.x, -origin.y, 0) *
             mat4.translation(position.x, position.y, 0) *
             mat4.translation(origin.x, origin.y, 0) *
-            mat4.zrotation(rotation) * 
+            mat4.zRotation(rotation) * 
             mat4.translation(-origin.x, -origin.y, 0) *
             mat4.scaling(position.z, position.w, 0);
 

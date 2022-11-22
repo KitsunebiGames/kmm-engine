@@ -28,6 +28,11 @@ public:
     uint id;
 
     /**
+        Type name of the entity    
+    */
+    string typeName;
+
+    /**
         Script attached to this object
     */
     string script;
@@ -41,5 +46,4 @@ public:
         The position of the game object
     */
     vec2 position;
-    
 }

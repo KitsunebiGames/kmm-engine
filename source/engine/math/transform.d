@@ -5,7 +5,7 @@
     Authors: Luna Nielsen
 */
 module engine.math.transform;
-import gl3n.linalg;
+import inmath;
 
 /**
     A 3D transform
@@ -16,12 +16,12 @@ private:
 
     // Generated matrix
     mat4 g_matrix() {
-        return mat4.translation(position) * rotation.to_matrix!(4, 4) * mat4.scaling(scale.x, scale.y, scale.z);
+        return mat4.translation(position) * rotation.toMatrix!(4, 4) * mat4.scaling(scale.x, scale.y, scale.z);
     }
 
     // Generated matrix
     mat4 g_matrix_ns() {
-        return mat4.translation(position) * rotation.to_matrix!(4, 4);
+        return mat4.translation(position) * rotation.toMatrix!(4, 4);
     }
 
 public:
@@ -111,7 +111,7 @@ private:
     // Generated matrix
     mat4 g_matrix() {
         return 
-            mat4.zrotation(rotation) * 
+            mat4.zRotation(rotation) * 
             mat4.scaling(scale.x, scale.y, 1) * 
             mat4.translation(position.x, position.y, 0) * 
             mat4.translation(origin.x, origin.y, 0);

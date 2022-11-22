@@ -1,7 +1,7 @@
 module editor.ui;
 public import editor.ui.core : kmEditorUIBegin, kmEditorUIEnd, kmEditorUIInit;
 public import editor.ui.menubar;
-public import editor.ui.elementlist;
+public import editor.ui.assetlist;
 import bindbc.imgui;
 
 private ImGuiID dockspace;
@@ -29,7 +29,7 @@ void kmEditorDrawUI() {
         }
     
         kmEditorUIMenuBar();
-        kmEditorElementListWindow();
+        kmEditorAssetListWindow();
 
     kmEditorUIEnd();
 }

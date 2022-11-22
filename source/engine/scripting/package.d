@@ -8,6 +8,8 @@ public import engine.scripting.state;
 public import engine.scripting.tools;
 public import engine.scripting.reg;
 public import engine.scripting.script;
+public import engine.scripting.utils;
+public import engine.scripting.engine;
 
 package(engine) {
     LuaSupport initScripting() {

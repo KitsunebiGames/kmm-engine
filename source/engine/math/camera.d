@@ -5,7 +5,7 @@
     Authors: Luna Nielsen
 */
 module engine.math.camera;
-import gl3n.linalg;
+import inmath;
 import engine;
 
 /**

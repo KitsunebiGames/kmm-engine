@@ -74,6 +74,9 @@ void initEngine() {
     // Initialize pak reader
     kmPakInit();
     AppLog.info("Engine", "Content managment initialized...");
+
+    inInit(() { return SDL_GetTicks(); });
+    AppLog.info("Engine", "Inochi2D integration initialized...");
 }
 
 /**

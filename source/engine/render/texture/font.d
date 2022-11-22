@@ -513,7 +513,7 @@ public:
             mat4.translation(-origin.x, -origin.y, 0) *
             mat4.translation(pos.x, pos.y, 0) *
             mat4.translation(origin.x, origin.y, 0) *
-            mat4.zrotation(rotation) * 
+            mat4.zRotation(rotation) * 
             mat4.translation(-origin.x, -origin.y, 0) *
             mat4.scaling(area.z*scale, area.w*scale, 0);
 

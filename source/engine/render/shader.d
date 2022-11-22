@@ -7,7 +7,7 @@
 module engine.render.shader;
 import engine;
 import std.string;
-import gl3n.linalg;
+import inmath;
 
 /**
     A shader
@@ -129,6 +129,6 @@ public:
     }
 
     void setUniform(GLint uniform, mat4 value) {
-        glUniformMatrix4fv(uniform, 1, GL_TRUE, value.value_ptr);
+        glUniformMatrix4fv(uniform, 1, GL_TRUE, value.ptr);
     }
 }

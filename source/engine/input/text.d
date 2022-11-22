@@ -202,7 +202,7 @@ public static:
     /**
         Sets the input area for IME display
     */
-    void setInputArea(Rect rect) {
+    void setInputArea(rect rect) {
         SDL_Rect r = reinterpret_cast!SDL_Rect(rect);
         SDL_SetTextInputRect(&r);
     }

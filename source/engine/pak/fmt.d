@@ -12,7 +12,7 @@ import std.bitmanip;
 import std.traits;
 
 /// Kitsunemimi Package Type 0
-enum PAK_MAGIC = "FOXPAK_0";
+enum PAK_MAGIC = "FOXPAK00";
 
 /**
     An entry in the PAK table

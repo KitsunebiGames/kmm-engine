@@ -7,7 +7,7 @@
 module engine.input.mouse;
 import engine.input;
 import bindbc.sdl;
-import gl3n.linalg;
+import inmath;
 
 /**
     The buttons on a mouse
