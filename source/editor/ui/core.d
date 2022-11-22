@@ -37,7 +37,6 @@ void kmEditorUIInit() {
 
     // Setup configuration
     io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;           // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags.ViewportsEnable;         // Enable Viewports (causes freezes)
     io.ConfigWindowsResizeFromEdges = true;                     // Enable Edge resizing
     io.IniFilename = null;
 
@@ -46,6 +45,11 @@ void kmEditorUIInit() {
     ImGuiOpenGLBackend.init(null);
 
     kmEditorUIApplyTheme();
+    
+
+    kmSDLEventCallbacks ~= (SDL_Event* ev) {
+        ImGui_ImplSDL2_ProcessEvent(ev);
+    };
 }
 
 void kmEditorUIBegin() {

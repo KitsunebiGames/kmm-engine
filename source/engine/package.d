@@ -18,6 +18,8 @@ public import engine.scripting;
 public import engine.gct;
 public import engine.pak;
 
+import inochi2d;
+
 import bindbc.sdl;
 import bindbc.openal;
 import bindbc.freetype;

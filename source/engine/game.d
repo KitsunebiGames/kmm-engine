@@ -47,6 +47,11 @@ void function() kmPostUpdate;
 void function() kmCleanup;
 
 /**
+    Callbacks to SDL events
+*/
+void function(SDL_Event*)[] kmSDLEventCallbacks;
+
+/**
     Starts the game loop
 
     viewportSize sets the desired viewport size for the framebuffer, defaults to 1080p (1920x1080)
@@ -113,6 +118,11 @@ void startGame(string[] args, vec2i viewportSize = vec2i(1920, 1080)) {
             while(SDL_PollEvent(&ev) == 1) {
                 Controller.update(&ev);
                 TextInput.update(&ev);
+            
+                // Iterate all registered event callbacks
+                foreach(cb; kmSDLEventCallbacks) {
+                    cb(&ev);
+                }
 
                 // Handle window close
                 if (ev.window.event == SDL_WindowEventID.SDL_WINDOWEVENT_CLOSE) {
@@ -184,6 +194,11 @@ private void _kmRenderExceptionLoop(vec2i viewportSize, Exception ex) {
         while(SDL_PollEvent(&ev) == 1) {
             Controller.update(&ev);
             TextInput.update(&ev);
+            
+            // Iterate all registered event callbacks
+            foreach(cb; kmSDLEventCallbacks) {
+                cb(&ev);
+            }
 
             // Handle window close
             if (ev.window.event == SDL_WindowEventID.SDL_WINDOWEVENT_CLOSE) {

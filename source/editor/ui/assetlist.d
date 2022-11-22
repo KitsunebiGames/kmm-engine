@@ -6,6 +6,6 @@ void kmEditorAssetListWindow() {
         ImGuiWindowFlags.NoTitleBar;
     if (igBegin("#AssetList", null, flags)) {
 
-        igEnd();
     }
+    igEnd();
 }
